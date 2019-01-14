@@ -1,7 +1,4 @@
-# 2019-FBSD
-
-Fast Blurred Segment Detector
------------------------------
+# Fast Blurred Segment Detector
 
 Requires at least Qt5.5
 Compilation by qmake and make
