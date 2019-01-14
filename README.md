@@ -1,4 +1,4 @@
-# Fast Blurred Segment Detector
+# FBSD: Fast Blurred Segment Detector
 
 Requires at least Qt5.5
 Compilation by qmake and make
