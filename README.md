@@ -5,8 +5,10 @@ Fast Blurred Segment Detector
 
 Requires at least Qt5.5
 Compilation by qmake and make
-Execution : FBSD <imageName>
-Test on synthetized images : FBSD -random (requires some patience)
+
+Execution : `FBSD <imageName>`
+
+Test on synthetized images : `FBSD -random` (requires some patience)
 
 Controls :
 --------
