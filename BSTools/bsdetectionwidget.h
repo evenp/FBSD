@@ -263,6 +263,21 @@ private:
   /** Height of the present image. */
   int height;
 
+  /** Maximal window width. */
+  int maxWidth;
+  /** Maximal window height. */
+  int maxHeight;
+  /** Maximal value of x-scroll shift. */
+  int xMaxShift;
+  /** Maximal value of y-scroll shift. */
+  int yMaxShift;
+  /** X-scroll shift. */
+  int xShift;
+  /** Y-scroll shift. */
+  int yShift;
+  /** Window zoom. */
+  int zoom;
+
   /** Blurred segment detector. */
   BSDetector detector;
   /** Initial detection graphics view. */

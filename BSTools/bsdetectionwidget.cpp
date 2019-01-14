@@ -52,6 +52,14 @@ BSDetectionWidget::BSDetectionWidget (QWidget *parent)
   bsPointsVisible = true;
   boundColor = Qt::green;
   boundHighColor = Qt::magenta;
+
+  maxWidth = 768;
+  maxHeight = 512;
+  xMaxShift = 0;
+  yMaxShift = 0;
+  xShift = 0;
+  yShift = 0;
+  zoom = 1;
 }
 
 
@@ -85,7 +93,13 @@ QSize BSDetectionWidget::openImage (const QString &fileName, int type)
   if (strucview != NULL) strucview->setGradientImage (&gradImage);
   */
 
-  return newSize.boundedTo (QSize (768, 512));
+  xMaxShift = (width > maxWidth ? maxWidth - width : 0);
+  yMaxShift = (height > maxHeight ? maxHeight - height : 0);
+  xShift = xMaxShift / 2;
+  if (xShift > 0) xShift = 0;
+  yShift = yMaxShift / 2;
+  if (yShift > 0) yShift = 0;
+  return newSize.boundedTo (QSize (maxWidth, maxHeight));
 }
 
 
@@ -180,7 +194,8 @@ void BSDetectionWidget::buildGradientImage (int dir)
 void BSDetectionWidget::paintEvent (QPaintEvent *)
 {
   QPainter painter (this);
-  painter.drawImage (QPoint (0, 0), augmentedImage);
+  QImage zoomImage = augmentedImage.scaled (width / zoom, height / zoom);
+  painter.drawImage (QPoint (xShift, yShift), zoomImage);
 }
 
 
@@ -326,7 +341,9 @@ void BSDetectionWidget::mousePressEvent (QMouseEvent *event)
   oldp1.set (p1);
   oldp2.set (p2);
   oldudef = udef;
-  p1 = Pt2i (event->pos().x (), height - 1 - event->pos().y());
+  int ex = zoom * (event->pos().x () - xShift);
+  int ey = zoom * (event->pos().y () - yShift);
+  p1 = Pt2i (ex, height - 1 - ey);
   if (p1.manhattan (p2) < 10) p1.set (oldp1);
   else if (p1.manhattan (oldp1) < 10) p1.set (p2);
   udef = true;
@@ -335,7 +352,9 @@ void BSDetectionWidget::mousePressEvent (QMouseEvent *event)
 
 void BSDetectionWidget::mouseReleaseEvent (QMouseEvent *event)
 {
-  p2 = Pt2i (event->pos().x (), height - 1 - event->pos().y());
+  int ex = zoom * (event->pos().x () - xShift);
+  int ey = zoom * (event->pos().y () - yShift);
+  p2 = Pt2i (ex, height - 1 - ey);
   if (p1.equals (p2))
   {
     p1.set (oldp1);
@@ -354,7 +373,9 @@ void BSDetectionWidget::mouseReleaseEvent (QMouseEvent *event)
 
 void BSDetectionWidget::mouseMoveEvent (QMouseEvent *event)
 {
-  p2 = Pt2i (event->pos().x (), height - 1 - event->pos().y ());
+  int ex = zoom * (event->pos().x () - xShift);
+  int ey = zoom * (event->pos().y () - yShift);
+  p2 = Pt2i (ex, height - 1 - ey);
   if (verbose) cerr << "(" << p1.x () << ", " << p1.y () << ") ("
                     << p2.x () << ", " << p2.y () << ")" << endl;
   if (p1.manhattan (p2) > 5
@@ -391,13 +412,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       else
       {
         // Tunes the gradient resolution for gradient local max filtering
-        /*
         detector.incGradientResolution (
           (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Gradient resolution for local max filtering = "
+        cout << "Gradient resolution = "
              << detector.getGradientResolution () << endl;
         extract ();
-        */
       }
       break;
 
@@ -413,7 +432,7 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
         // Switches density test at initial step
         detector.switchDensityTest ();
         extract ();
-        cout << "Density test after initial detection : "
+        cout << "Density test : "
              << (detector.isDensityTestOn () ? "on" : "off") << endl;
       }
       break;
@@ -442,13 +461,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches initial detection filtering
-        /*
         detector.switchFiltering (BSDetector::STEP_INITIAL);
         cout << "Pre-filtering "
              << (detector.isFiltering (BSDetector::STEP_INITIAL) ? "on" : "off")
              << endl;
         extract ();
-        */
       }
       break;
 
@@ -475,13 +492,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches final detection filtering
-        /*
         detector.switchFiltering (BSDetector::STEP_FINAL);
         cout << "Final filtering "
              << (detector.isFiltering (BSDetector::STEP_FINAL) ? "on" : "off")
              << endl;
         extract ();
-        */
       }
       break;
 
@@ -489,31 +504,27 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches the proximity constraint for fast tracks
-        /*
         detector.switchFastTrackProximityConstraint ();
         cout << "Proximity constraint on fast tracks "
              << (detector.fastTrackProximityConstraintOn () ? "on" : "off")
              << endl;
         extract ();
-        */
       }
       else if (detector.fastTrackProximityConstraintOn ())
       {
         // Tunes the proximity threshold for fast tracks
-        /*
         detector.incFastTrackProximityThreshold (
                     (event->modifiers () & Qt::ShiftModifier) == 0);
         cout << "Proximity threshold for fast tracks = "
              << detector.getFastTrackProximityThreshold () << endl;
         extract ();
-        */
       }
       break;
 
     case Qt::Key_K :
       if (event->modifiers () & Qt::ControlModifier)
       {
-        // Switches the final step fragmentation test
+        // Switches the final step connectivity constraint
         detector.switchConnectivityConstraint ();
         cout << "Fragmentation test "
              << (detector.isConnectivityConstraintOn () ? "on" : "off")
@@ -596,20 +607,16 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches the scan directionality
-        /*
         detector.switchOrthoScans ();
         cout << (detector.orthoScansOn () ?
                  "Orthographic scans" : "Directional scans") << endl;
         extract ();
-        */
       }
       else
       {
         // Outputs the detected segment
-        /*
         writeDetectionResult ();
         cout << "Detection result output" << endl;
-        */
       }
       break;
 
@@ -651,12 +658,10 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Toggles the occupancy mask dilation type
-        /*
         gMap->toggleMaskDilation ();
         extract ();
         cout << "Occupancy mask dilation size : "
              << gMap->getMaskDilation () << endl;
-        */
       }
       else
       {
@@ -672,12 +677,10 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches the interruption handling
-        /*
         detector.switchAutoRestart ();
         extract ();
         cout << "Segment continuation after = "
              << detector.getRestartOnLack () << " pixels" << endl;
-        */
       }
       else
       {
@@ -694,14 +697,12 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches the progressive thinning
-        /*
         detector.toggleThinning ();
         if (detector.isThinningOn () && detector.isThickenningOn ())
           detector.toggleThickenning ();
         extract ();
         cout << "Thinning "
              << (detector.isThinningOn () ? "on" : "off") << endl;
-        */
       }
       break;
 
@@ -733,23 +734,19 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches the scan centering on the detected segment
-        /*
         detector.switchScanRecentering ();
         cout << "Fine tracking centered on " << (detector.isScanRecentering () ?
                 "detected segment" : "initial scan") << endl;
         extract ();
-        */
       }
       else
       {
-        // Tunes the assigned max width margin for fast tracks
-        /*
+        // Tunes the assigned max width margin for fine tracks
         detector.setFastTracksMaxMargin (detector.fastTracksMaxMargin () +
           (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
         extract ();
         cout << "Fast tracks max width margin = "
              << detector.fastTracksMaxMargin () << endl;
-        */
       }
       break;
 
@@ -757,12 +754,10 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches the setting of the assigned width on the detected segment
-        /*
         detector.switchScanFitting ();
         cout << "Fine tracking fitted to " << (detector.isScanFitting () ?
                 "detected segment width" : "assigned width") << endl;
         extract ();
-        */
       }
       else
       {
@@ -834,8 +829,61 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       writeTest ();
       break;
 
+    case Qt::Key_Plus :
+      if (zoom > 1)
+      {
+        zoom /= 2;
+        xShift = xShift * 2 - maxWidth / 2;
+        yShift = yShift * 2 - maxHeight / 2;
+        displayDetectionResult ();
+      }
+      break;
+
+    case Qt::Key_Minus :
+      if (width / zoom > maxWidth || height / zoom > maxHeight)
+      {
+        zoom *= 2;
+        xShift = xShift / 2 + maxWidth / 4;
+        if (xShift > 0) xShift = 0;
+        if ((maxWidth - xShift) * zoom > width)
+          xShift = maxWidth - width / zoom;
+        yShift = yShift / 2 + maxHeight / 4;
+        if (yShift > 0) yShift = 0;
+        if ((maxHeight - yShift) * zoom > height)
+          yShift = maxHeight - height / zoom;
+        displayDetectionResult ();
+      }
+      break;
+
+    case Qt::Key_Left :
+      xShift += 50;
+      if (xShift > 0) xShift = 0;
+      displayDetectionResult ();
+      break;
+
+    case Qt::Key_Right :
+      xShift -= 50;
+      if ((maxWidth - xShift) * zoom > width)
+        xShift = maxWidth - width / zoom;
+      displayDetectionResult ();
+      break;
+
+    case Qt::Key_Up :
+      yShift += 50;
+      if (yShift > 0) yShift = 0;
+      displayDetectionResult ();
+      break;
+
+    case Qt::Key_Down :
+      yShift -= 50;
+      if ((maxHeight - yShift) * zoom > height)
+        yShift = maxHeight - height / zoom;
+      displayDetectionResult ();
+      break;
+
+/*
     case Qt::Key_1 :
-      // switchPixelAnalyzer ();
+      switchPixelAnalyzer ();
       break;
 
     case Qt::Key_2 :
@@ -843,21 +891,20 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_3 :
-      // switchProfileAnalyzer ();
+      switchProfileAnalyzer ();
       break;
 
     case Qt::Key_4 :
-      // switchIdetAnalyzer ();
+      switchIdetAnalyzer ();
       break;
+*/
 
     case Qt::Key_5 :
       // Switches the crosswise segment detection
-      /*
       detector.switchTrackCrosswise ();
       extract ();
       cout << "Crosswise segment detection "
            << (detector.trackCrosswiseOn () ? "on" : "off") << endl;
-      */
       break;
 
     case Qt::Key_6 :
@@ -868,7 +915,7 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_7 :
-      // storeUserInput ();
+      storeUserInput ();
       break;
 
     case Qt::Key_8 :

@@ -48,6 +48,9 @@ Keyboard controls are :
 | z/Z | Tunes the assigned width control delay.
 | 6   | Sets the previous detector on or off (off by default).
 | 8   | Performs comparative tests between previous and new detectors.
+| <>  | Horizontal shift (on large images, example: general.png).
+| ^v  | Vertical shift (on large images, example: general.png).
+| +-  | Zoom (on large images, example: general.png).
 
 Example :
 -------
