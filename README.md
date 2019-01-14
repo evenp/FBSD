@@ -55,9 +55,9 @@ Keyboard controls are :
 Example :
 -------
 
-Command : `FBSD Images/couloir.png`
+Command : `FBSD Images/couloir.gif`
 
-<img width="256" src="https://github.com/evenp/FBSD/blob/master/Images/couloir.png" alt="Initial image" />
+<img width="256" src="https://github.com/evenp/FBSD/blob/master/Images/couloir.gif" alt="Initial image" />
 
 Right mouse click and drag :
 
