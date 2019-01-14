@@ -9,9 +9,9 @@
 #include <fstream>
 #include "bsdetector.h"
 // #include "bsaccumulatorview.h"
-#include "bsstructureview.h"
-#include "bsprofileview.h"
-#include "bsidetview.h"
+// #include "bsstructureview.h"
+// #include "bsprofileview.h"
+// #include "bsidetview.h"
 
 using namespace std;
 
@@ -85,22 +85,22 @@ public:
   /**
    * \brief Requires the pixel analysis window closure.
    */
-  void closePixelAnalyzer ();
+  // void closePixelAnalyzer ();
 
   /**
    * \brief Requires the profile analysis window closure.
    */
-  void closeProfileAnalyzer ();
+  // void closeProfileAnalyzer ();
 
   /**
    * \brief Requires the initial detection analysis window closure.
    */
-  void closeIdetAnalyzer ();
+  // void closeIdetAnalyzer ();
 
   /**
    * \brief Switches the pixel display window on or off.
    */
-  void switchPixelAnalyzer ();
+  // void switchPixelAnalyzer ();
 
   /**
    * \brief Switches the accumulator display window on or off.
@@ -110,12 +110,12 @@ public:
   /**
    * \brief Switches the profile display window on or off.
    */
-  void switchProfileAnalyzer ();
+  // void switchProfileAnalyzer ();
 
   /**
    * \brief Switches the initial detection display window on or off.
    */
-  void switchIdetAnalyzer ();
+  // void switchIdetAnalyzer ();
 
   /**
    * \brief Switches the blurred segment highlight colors.
@@ -281,13 +281,13 @@ private:
   /** Blurred segment detector. */
   BSDetector detector;
   /** Initial detection graphics view. */
-  BSIdetView *idetview;
+  // BSIdetView *idetview;
   /** Scanned profile graphics view. */
-  BSProfileView *profileview;
+  // BSProfileView *profileview;
   /** Filter accumulator view. */
   // BSAccumulatorView *accuview;
   /** Blurred segment contents view. */
-  BSStructureView *strucview;
+  // BSStructureView *strucview;
 
   /** Aggregation of segment extraction results with initial conditions. */
   struct ExtractedSegment

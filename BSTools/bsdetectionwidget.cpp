@@ -32,9 +32,9 @@ BSDetectionWidget::BSDetectionWidget (QWidget *parent)
   // Initializes the gradient map and the auxiliary views
   gMap = NULL;
   // accuview = NULL;
-  strucview = NULL;
-  profileview = NULL;
-  idetview = NULL;
+  // strucview = NULL;
+  // profileview = NULL;
+  // idetview = NULL;
 
   // Sets initial user outputs parameters
   verbose = false;
@@ -66,9 +66,9 @@ BSDetectionWidget::BSDetectionWidget (QWidget *parent)
 BSDetectionWidget::~BSDetectionWidget ()
 {
   // if (accuview != NULL) delete accuview;
-  if (strucview != NULL) delete strucview;
-  if (profileview != NULL) delete profileview;
-  if (idetview != NULL) delete idetview;
+  // if (strucview != NULL) delete strucview;
+  // if (profileview != NULL) delete profileview;
+  // if (idetview != NULL) delete idetview;
 }
 
 
@@ -87,9 +87,11 @@ QSize BSDetectionWidget::openImage (const QString &fileName, int type)
   buildGradientImage (0);
  
   update ();
+  /*
   if (idetview != NULL) idetview->setImage (&loadedImage, gMap);
   if (profileview != NULL) profileview->setImage (&loadedImage, gMap);
   if (strucview != NULL) strucview->setGradientImage (&gradImage);
+  */
 
   xMaxShift = (width > maxWidth ? maxWidth - width : 0);
   yMaxShift = (height > maxHeight ? maxHeight - height : 0);
@@ -207,7 +209,6 @@ void BSDetectionWidget::closeAccuAnalyzer ()
     accuview = NULL;
   }
 }
-*/
 
 
 void BSDetectionWidget::closePixelAnalyzer ()
@@ -243,7 +244,6 @@ void BSDetectionWidget::closeIdetAnalyzer ()
 }
 
 
-/*
 void BSDetectionWidget::switchAccuAnalyzer ()
 {
   if (accuview != NULL)
@@ -258,7 +258,6 @@ void BSDetectionWidget::switchAccuAnalyzer ()
     accuview->show ();
   }
 }
-*/
 
 
 void BSDetectionWidget::switchPixelAnalyzer ()
@@ -312,6 +311,7 @@ void BSDetectionWidget::switchIdetAnalyzer ()
     idetview->show ();
   }
 }
+*/
 
 
 void BSDetectionWidget::switchHighlightColors ()
@@ -882,7 +882,7 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_1 :
-      switchPixelAnalyzer ();
+      // switchPixelAnalyzer ();
       break;
 
     case Qt::Key_2 :
@@ -890,11 +890,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_3 :
-      switchProfileAnalyzer ();
+      // switchProfileAnalyzer ();
       break;
 
     case Qt::Key_4 :
-      switchIdetAnalyzer ();
+      // switchIdetAnalyzer ();
       break;
 
     case Qt::Key_5 :
@@ -928,14 +928,15 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       localTest ();
       break;
   }
+  /*
   else if (strucview != NULL && strucview->isActiveWindow ())
   {
     if (strucview->processKeyEvent (event)) extract ();
   }
-  /* else if (accuview != NULL && accuview->isActiveWindow ())
+  else if (accuview != NULL && accuview->isActiveWindow ())
   {
     if (accuview->processKeyEvent (event)) extract ();
-  } */
+  }
   else if (profileview != NULL && profileview->isActiveWindow ())
   {
     if (profileview->processKeyEvent (event)) extract ();
@@ -944,6 +945,7 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
   {
     if (idetview->processKeyEvent (event)) extract ();
   }
+  */
 }
 
 
@@ -1162,6 +1164,7 @@ void BSDetectionWidget::displayDetectionResult ()
   // Update auxiliary view if not dragging
   if (nodrag)
   {
+    /*
     if (idetview != NULL) idetview->update ();
     if (profileview != NULL)
     {
@@ -1174,6 +1177,7 @@ void BSDetectionWidget::displayDetectionResult ()
       strucview->scene()->update ();
       strucview->repaint ();
     }
+    */
     if (verbose) writeDetectionStatus ();
     if (stats) writeStats ();
   }
