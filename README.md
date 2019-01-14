@@ -7,6 +7,10 @@ Execution : `FBSD <imageName>`
 
 Test on synthetized images : `FBSD -random` (requires some patience)
 
+<a href="http://ipol-geometry.loria.fr/~kerautre/ipol_demo/FBSD_IPOLDemo">Online demo</a> also available.
+
+# Application control
+
 Use right mouse button to define an input stroke.
 
 Keyboard controls are :
@@ -34,7 +38,7 @@ Keyboard controls are :
 | k/K | Tunes the fragments (connected components) minimal size
 | l/L | Tunes the minimal size of the detected blurred segments.
 | m   | Detects all the segments in the image
-| n   | Hilghlights the next detected segment in a multi-detection.
+| n   | Highlights the next detected segment in a multi-detection.
 | p   | Saves detection window in capture.png
 | q   | Displays all the registered blurred segments.
 | r/R | Tunes the sweeping resolution of automatic detections.
