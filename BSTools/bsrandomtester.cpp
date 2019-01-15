@@ -52,10 +52,9 @@ BSRandomTester::BSRandomTester ()
   c_ldet = new int[nbt];
   c_unmatch = new int[nbt];
   c_undet = new int[nbt];
-  c_trueArea = new int[nbt];
-  c_falseArea = new int[nbt];
-  c_redetArea = new int[nbt];
+  c_true = new int[nbt];
   c_false = new int[nbt];
+  c_redet = new int[nbt];
 
   m_precision = new double[nbt];
   m_recall = new double[nbt];
@@ -103,10 +102,9 @@ BSRandomTester::~BSRandomTester ()
   delete [] m_fmeasure;
   delete [] m_recall;
   delete [] m_precision;
+  delete [] c_redet;
   delete [] c_false;
-  delete [] c_redetArea;
-  delete [] c_falseArea;
-  delete [] c_trueArea;
+  delete [] c_true;
   delete [] c_undet;
   delete [] c_unmatch;
   delete [] c_ldet;
@@ -166,7 +164,7 @@ void BSRandomTester::randomTest ()
       for (int i = 0; i < nbsegs; i++) rbs[i].clear ();
       c_unmatch[num] = 0;
       int nbdssnul = 0;
-      c_ldet[run] = 0;
+      c_ldet[num] = 0;
       double nomatchlength = 0.;
       vector<BlurredSegment *> bss = detectors[det].getBlurredSegments ();
       vector<BlurredSegment *>::iterator bsit = bss.begin ();
@@ -214,11 +212,13 @@ void BSRandomTester::randomTest ()
           {
             double denom = rdir[si].norm2 () * dssdir.norm2 ();
             score[si] = rdir[si].squaredScalarProduct (dssdir) / denom;
-            Vr2i bsac = rp1[si].vectorTo (bsc);
-            denom = rdir[si].norm2 () * bsac.norm2 ();
-            score[si] *= rdir[si].squaredScalarProduct (bsac) / denom;
-            if (rdir[si].scalarProduct (bsac) < 0) score[si] = 0.;
+            Vr2i bsca = rp1[si].vectorTo (bsc);
             Vr2i bscb = bsc.vectorTo (rp2[si]);
+            Vr2i *bsac = (rp1[si].chessboard (bsc) < sminlength / 2 ?
+                          &bscb : &bsca);
+            denom = rdir[si].norm2 () * bsac->norm2 ();
+            score[si] *= rdir[si].squaredScalarProduct (*bsac) / denom;
+            if (rdir[si].scalarProduct (bsca) < 0) score[si] = 0.;
             if (rdir[si].scalarProduct (bscb) < 0) score[si] = 0.;
             if (minscore < score[si])
             {
@@ -232,7 +232,7 @@ void BSRandomTester::randomTest ()
             c_unmatch[num] ++;
             nomatchlength += sqrt (bsl2);
           }
-          delete dss;
+          if (unbiasOn) delete dss;
         }
         else nbdssnul ++;
         bsit ++;
@@ -251,34 +251,39 @@ void BSRandomTester::randomTest ()
       }
       if (dispLast && run == nbruns - 1) createMap (names[det]);
       c_undet[num] = 0;
-      c_trueArea[num] = 0;
-      c_falseArea[num] = 0;
+      c_true[num] = 0;
+      c_false[num] = 0;
       for (int i = 0; i < width * height; i++)
       {
         if (stilltofind_map[i]) c_undet[num] ++;
-        if (foundin_map[i]) c_trueArea[num] ++;
-        if (foundout_map[i]) c_falseArea[num] ++;
+        if (foundin_map[i]) c_true[num] ++;
+        if (foundout_map[i]) c_false[num] ++;
       }
       if (dispEach)
         cout << (nbIniPts[run] - c_undet[num]) << " points detected on "
              << nbIniPts[run] << " ("
              << (nbIniPts[run] - c_undet[num]) * 100 / (double) nbIniPts[run]
              << " %)" << endl;
-      c_redetArea[num] = 0;
+      c_redet[num] = 0;
       for (int i = 0; i < width * height; i++)
-        if (hit_map[i] > 1) c_redetArea[num] += (hit_map[i] - 1);
+        if (hit_map[i] > 1) c_redet[num] += (hit_map[i] - 1);
       if (dispEach)
-        cout << c_redetArea[num] << " points redetected on " << nbIniPts[run]
-             << " (" << c_redetArea[num] * 100 / (double) nbIniPts[run]
+        cout << c_redet[num] << " points redetected on " << nbIniPts[run]
+             << " (" << c_redet[num] * 100 / (double) nbIniPts[run]
              << " %)" << endl;
-      c_false[num] = 0;
-      for (int i = 0; i < width * height; i++)
-        if (hit_map[i] < 0) c_false[num] ++;
       m_precision[num] = nbIniPts[run] - c_undet[num];
       m_recall[num] = m_precision[num] / nbIniPts[run];
-      m_precision[num] = m_precision[num] / (m_precision[num] + c_false[num]);
-      m_fmeasure[num] = 2 * m_precision[num] * m_recall[num]
-                      / (m_precision[num] + m_recall[num]);
+      if (m_precision[num] + c_false[num] != 0)
+      {
+        m_precision[num] = m_precision[num] / (m_precision[num] + c_false[num]);
+        m_fmeasure[num] = 2 * m_precision[num] * m_recall[num]
+                          / (m_precision[num] + m_recall[num]);
+      }
+      else
+      {
+        m_precision[num] = 0.;
+        m_fmeasure[num] = 0.;
+      }
       if (dispEach)
       {
         cout << c_false[num] << " false points detected on " << nbIniPts[run]
@@ -338,7 +343,7 @@ void BSRandomTester::randomTest ()
             m_adiff[num] += (onleft ? ang : -ang);
             if (bsl2 > longEdgeThreshold) m_long_absadiff[num] += ang;
           }
-          delete mydss;
+          if (unbiasOn) delete mydss;
           sit ++;
         }
       }
@@ -418,6 +423,7 @@ void BSRandomTester::randomTest ()
     cout << mean << " (pm " << sdev
          << ") undetected segments per image" << endl;
 
+    /*
     mean = 0.;
     sdev = 0.;
     for (int i = 0; i < nbruns; i++)
@@ -429,16 +435,17 @@ void BSRandomTester::randomTest ()
               * ((nbIniPts[i] - c_undet[det * nbruns + i])
                  / (double) nbIniPts[i] - mean);
     sdev = sqrt (sdev / (nbruns - 1));
-    cout << "Recall : " << 100 * mean << " (pm " << 100 * sdev
+    cout << "Weighted recall : " << 100 * mean << " (pm " << 100 * sdev
          << ") % of points found" << endl;
+    */
 
     mean = 0.;
     sdev = 0.;
-    for (int i = 0; i < nbruns; i++) mean += c_redetArea[det * nbruns + i];
+    for (int i = 0; i < nbruns; i++) mean += c_redet[det * nbruns + i];
     mean /= total_nbIniPts;
     for (int i = 0; i < nbruns; i++)
-      sdev += (c_redetArea[det * nbruns + i] / (double) nbIniPts[i] - mean)
-              * (c_redetArea[det * nbruns + i] / (double) nbIniPts[i] - mean);
+      sdev += (c_redet[det * nbruns + i] / (double) nbIniPts[i] - mean)
+              * (c_redet[det * nbruns + i] / (double) nbIniPts[i] - mean);
     sdev = sqrt (sdev / (nbruns - 1));
     cout << 100 * mean << " (pm " << 100 * sdev
          << ") % of points found more than once (redetections)" << endl;
@@ -454,6 +461,7 @@ void BSRandomTester::randomTest ()
     cout << 100 * mean << " (pm " << 100 * sdev
          << ") % false points produced" << endl;
 
+    /*
     mean = 0.;
     sdev = 0.;
     int numer = 0;
@@ -469,7 +477,8 @@ void BSRandomTester::randomTest ()
       sdev += (m_precision[det * nbruns + i] - mean)
               * (m_precision[det * nbruns + i] - mean);
     sdev = sqrt (sdev / (nbruns - 1));
-    cout << "Precision : " << mean << " (pm " << sdev << ")" << endl;
+    cout << "Weighted precision : " << mean << " (pm " << sdev << ")" << endl;
+    */
 
     mean = 0.;
     sdev = 0.;
@@ -479,8 +488,7 @@ void BSRandomTester::randomTest ()
       sdev += (m_precision[det * nbruns + i] - mean)
               * (m_precision[det * nbruns + i] - mean);
     sdev = sqrt (sdev / (nbruns - 1));
-    cout << "Statistical precision : " << mean
-         << " (pm " << sdev << ")" << endl;
+    cout << "Precision : " << mean << " (pm " << sdev << ")" << endl;
 
     mean = 0.;
     sdev = 0.;
@@ -490,7 +498,7 @@ void BSRandomTester::randomTest ()
       sdev += (m_recall[det * nbruns + i] - mean)
               * (m_recall[det * nbruns + i] - mean);
     sdev = sqrt (sdev / (nbruns - 1));
-    cout << "Statistical recall : " << mean << " (pm " << sdev << ")" << endl;
+    cout << "Recall : " << mean << " (pm " << sdev << ")" << endl;
 
     mean = 0.;
     sdev = 0.;
@@ -500,8 +508,7 @@ void BSRandomTester::randomTest ()
       sdev += (m_fmeasure[det * nbruns + i] - mean)
               * (m_fmeasure[det * nbruns + i] - mean);
     sdev = sqrt (sdev / (nbruns - 1));
-    cout << "Statistical F-measure : " << mean
-         << " (pm " << sdev << ")" << endl;
+    cout << "F-measure : " << mean << " (pm " << sdev << ")" << endl;
     total = 0;
     for (int i = 0; i < nbruns; i++) total += m_matched[det * nbruns + i];
 
@@ -610,39 +617,46 @@ void BSRandomTester::generateImage ()
       val = 255 - (rand () % 30);
       image.setPixel (i, j, val + val * 256 + val * 256 * 256);
     }
+
+  bool nok;
+  double score1, score2, score3;
+  Pt2i bsc1, bsc2;
+  Vr2i ali;
   for (int i = 0; i < nbsegs; i++)
   {
-    rp1[i].set (margin + rand () % swidth, margin + rand () % sheight);
-    bool nok = false;
     do
     {
       nok = false;
-      rp2[i].set (margin + rand () % swidth, margin + rand () % sheight);
+      rp1[i].set (margin + (rand () % swidth), margin + (rand () % sheight));
+      rp2[i].set (margin + (rand () % swidth), margin + (rand () % sheight));
       if (rp1[i].chessboard (rp2[i]) < sminlength) nok = true;
       else
       {
-        double score1, score2, score3;
         rdir[i] = rp1[i].vectorTo (rp2[i]);
-        Pt2i bsc ((rp1[i].x () + rp2[i].x ()) / 2,
+        bsc1.set ((rp1[i].x () + rp2[i].x ()) / 2,
                   (rp1[i].y () + rp2[i].y ()) / 2);
-        for (int si = 0; (! nok) && si < i - 1; si ++)
+        for (int si = 0; (! nok) && si < i; si ++)
         {
           score1 = rdir[si].squaredScalarProduct (rdir[i])
-                          / (rdir[si].norm2 () * rdir[i].norm2 ());
-          Vr2i ali = rp1[si].vectorTo (bsc);
+                          / (double) (rdir[si].norm2 () * rdir[i].norm2 ());
+          if (rp1[si].chessboard (bsc1) < sminlength / 2)
+            ali = bsc1.vectorTo (rp2[si]);
+          else ali = rp1[si].vectorTo (bsc1);
           score2 = rdir[si].squaredScalarProduct (ali)
-                   / (rdir[si].norm2 () * ali.norm2 ());
-          bsc.set ((rp1[si].x () + rp2[si].x ()) / 2,
-                   (rp1[si].y () + rp2[si].y ()) / 2);
-          ali = rp1[i].vectorTo (bsc);
+                   / (double) (rdir[si].norm2 () * ali.norm2 ());
+          bsc2.set ((rp1[si].x () + rp2[si].x ()) / 2,
+                    (rp1[si].y () + rp2[si].y ()) / 2);
+          if (rp1[i].chessboard (bsc2) < sminlength / 2)
+            ali = bsc2.vectorTo (rp2[i]);
+          else ali = rp1[i].vectorTo (bsc2);
           score3 = rdir[i].squaredScalarProduct (ali)
-                   / (rdir[i].norm2 () * ali.norm2 ());
-          if (score1 > 0.7 && (score2 > 0.7 || score3 > 0.7)) nok = true;
+                   / (double) (rdir[i].norm2 () * ali.norm2 ());
+          if (score1 > 0.9 && (score2 > 0.9 || score3 > 0.9)) nok = true;
         }
       }
     }
     while (nok);
-    rw[i] = sminwidth + rand () % (smaxwidth - sminwidth);
+    rw[i] = sminwidth + (rand () % (smaxwidth - sminwidth));
 
     DigitalStraightSegment dss (rp1[i], rp2[i], rw[i]);
     vector<Pt2i> pix;
@@ -663,6 +677,7 @@ void BSRandomTester::generateImage ()
       tofind_map[j * width + i] =
         QColor (image.pixel (i, height - 1 - j)).value () < 10;
         // QColor (image.pixel (i, height - 1 - j)).value () > 200; // ZZZ
+  if (dispEach) cout << "New segments generated" << endl;
 }
 
 

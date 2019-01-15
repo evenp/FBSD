@@ -79,15 +79,16 @@ private:
   int *rw;
   /** Occupancy map. */
   bool *tofind_map;
-  /** Detected points map. */
+  /** Amount of detected (positive) points.
+   * Negative sign for false positives, positive sign for true positives. */
   int *hit_map;
-  /** Undetected points map. */
+  /** Undetected points map (false negative points). */
   bool *stilltofind_map;
-  /** Found points map. */
+  /** Found points map (positive points). */
   bool *found_map;
-  /** Correct found points map. */
+  /** Correct found points map (true positive points). */
   bool *foundin_map;
-  /** Incorrect found points map. */
+  /** Incorrect found points map (false positive points). */
   bool *foundout_map;
 
   /** Per image results display modality. */
@@ -106,7 +107,7 @@ private:
   /** Gradient extraction bias value. */
   AbsRat biasVal;
 
-  /** ???. */
+  /** Amount of points to find (points of synthetized segments). */
   int *nbIniPts;
   /** Amount of tests on local minima per each detection. */
   int *c_trials;
@@ -116,16 +117,14 @@ private:
   int *c_ldet;
   /** Amount of unmatched segments per each detection. */
   int *c_unmatch;
-  /** Amount of ??? per each detection. */
+  /** Amount of undetected (false negative) points per each detection. */
   int *c_undet;
-  /** Amount of true area pixels per each detection. */
-  int *c_trueArea;
-  /** Amount of false area pixels per each detection. */
-  int *c_falseArea;
-  /** Amount of redetected area pixels per each detection. */
-  int *c_redetArea;
-  /** Amount of false pixels per each detection. */
+  /** Amount of trully detected (true positive) points per each detection. */
+  int *c_true;
+  /** Amount of wrongly detected (false positive) points per each detection. */
   int *c_false;
+  /** Amount of redetected points per each detection. */
+  int *c_redet;
 
   /** Measured precision per detector and per test. */
   double *m_precision;
