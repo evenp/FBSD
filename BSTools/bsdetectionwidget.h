@@ -85,22 +85,22 @@ public:
   /**
    * \brief Requires the pixel analysis window closure.
    */
-  // void closePixelAnalyzer ();
+  void closePixelAnalyzer ();
 
   /**
    * \brief Requires the profile analysis window closure.
    */
-  // void closeProfileAnalyzer ();
+  void closeProfileAnalyzer ();
 
   /**
    * \brief Requires the initial detection analysis window closure.
    */
-  // void closeIdetAnalyzer ();
+  void closeIdetAnalyzer ();
 
   /**
    * \brief Switches the pixel display window on or off.
    */
-  // void switchPixelAnalyzer ();
+  void switchPixelAnalyzer ();
 
   /**
    * \brief Switches the accumulator display window on or off.
@@ -110,12 +110,17 @@ public:
   /**
    * \brief Switches the profile display window on or off.
    */
-  // void switchProfileAnalyzer ();
+  void switchProfileAnalyzer ();
 
   /**
    * \brief Switches the initial detection display window on or off.
    */
-  // void switchIdetAnalyzer ();
+  void switchIdetAnalyzer ();
+
+  /**
+   * \brief Return whether the blurred segment highlight colors are set.
+   */
+  inline bool isHighlightColorsOn () const { return darkHighlightOn; }
 
   /**
    * \brief Switches the blurred segment highlight colors.
@@ -123,14 +128,23 @@ public:
   void switchHighlightColors ();
 
   /**
+   * \brief Returns whether random color display modality is set.
+   */
+  inline bool isArlequinOn () const { return arlequinOn; }
+
+  /**
    * \brief Switches the random color display modality.
    */
   void switchArlequin ();
 
   /**
+   * \brief Returns whether extraction stats are displayed. */
+  inline bool isStatsOn () const { return statsOn; }
+
+  /**
    * \brief Switches the extraction stats display on or off.
    */
-  inline void switchStats () { stats = ! stats; }
+  inline void switchStats () { statsOn = ! statsOn; }
 
   /**
    * \brief Switches the extraction result display on or off.
@@ -246,7 +260,7 @@ private:
   /** Black level used to lighten background images. */
   int blevel;
   /** Flag indicating whether detection stats should be output. */
-  bool stats;
+  bool statsOn;
   /** Flag indicating whether detection result should be output. */
   bool verbose;
 
@@ -403,9 +417,9 @@ private:
 
   /**
    * \brief Registers the last extracted blurred segment.
-   * Returns whether something is saved or not.
+   * Returns the count of registered segments more.
    */
-  bool saveExtractedSegment ();
+  int saveExtractedSegment ();
 
   /**
    * \brief Clears off the saved blurred segments.

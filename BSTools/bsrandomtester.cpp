@@ -68,6 +68,7 @@ BSRandomTester::BSRandomTester ()
   m_absadiff = new double[nbt];
   m_long_absadiff = new double[nbt];
 
+  gMap = NULL;
   detectors = new BSDetector[nbdets];
   for (int i = 0; i < nbdets; i++)
   {
