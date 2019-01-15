@@ -12,6 +12,7 @@ Test on synthetized images : `FBSD -random` (requires some patience)
 # Application control
 
 Use right mouse button to define an input stroke.
+
 On Mac systems, Cmd keys should be used instead of Ctrl keys.
 
 Keyboard controls are :
