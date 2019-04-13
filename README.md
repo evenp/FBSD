@@ -26,7 +26,10 @@ Test on synthetized images : `FBSD -random` (requires some patience)
 
 ## 2. Experimentations on real images
 
-![Alt text](Images/general.png?raw=true "Title")
+![**Fig: Automatic detection on real images: an input image (a), the segments found
+by the old detector (b) and those found by the new detector (c), and a detail of the
+image (d) and the enclosing digital segments for both old (e) and new (f) detectors.**](Images/expe.png?raw=true "Title")
+
 
 | Measure M  | T | N | L | W | 
 | :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
