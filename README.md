@@ -9,6 +9,12 @@ Test on synthetized images : `FBSD -random` (requires some patience)
 
 <a href="http://ipol-geometry.loria.fr/~kerautre/ipol_demo/FBSD_IPOLDemo">Online demo</a> also available.
 
+# Experimentals results
+
+1. Experimentations on synthesized images
+
+2. Experimentations on real images
+
 # Application control
 
 Use right mouse button to define an input stroke.
