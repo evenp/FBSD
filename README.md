@@ -12,6 +12,14 @@ Test on synthetized images : `FBSD -random` (requires some patience)
 # Experimentals results
 
 ## 1. Experimentations on synthesized images
+These tests compare the performance of both detectors on a set of 1000
+synthesized images containing 10 randomly placed input segments with random
+width between 2 and 5 pixels. The absolute value of the difference of each
+found segment to its matched input segment is measured. On these groundtruth
+image, the numerical error on the gradient extraction biases the line width
+measures. This bias was first estimated using 1000 images containing only one
+input segment (no possible interaction) and the found value (1.4 pixel) was taken
+into account in the test. The results are given in the following table.
 
 | Detector  | Old | New |
 | :---          |     :---:     |     :---:     | 
