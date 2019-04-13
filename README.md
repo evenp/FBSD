@@ -32,9 +32,9 @@ FIGURE HERE
 | Old method (M_old) on the image  | 29.51 ms | 306 segments | 38.58 pixels | 2.47 pixels |
 | New method (M_new) on the image  | 25.85 ms | 352 segments | 33.25 pixels | 2.17 pixels |
 | **M_old/M_new (%)** |
-|   &nbsp;&nbsp;&nbsp; on the image  | 29.51 ms | 306 segments | 38.58 pixels | 2.47 pixels |
-|   &nbsp;&nbsp;&nbsp; on the set od test images  | 25.85 ms | 352 segments | 33.25 pixels | 2.17 pixels |
-|   &nbsp;&nbsp;&nbsp; on CannyLines images  | 25.85 ms | 352 segments | 33.25 pixels | 2.17 pixels |
+|   &nbsp;&nbsp;&nbsp; on the image  | 87.60 | 115.03 | 86.18 | 87.85 |
+|   &nbsp;&nbsp;&nbsp; on the set od test images  | 85.47 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.26 | 108.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.86| 91.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.63 | 86.18 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.88 |
+|   &nbsp;&nbsp;&nbsp; on CannyLines images  | 86.02 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.44 | 110.15 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.51 | 89.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 5.11 | 84.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.98 |
 
 # Application control
 
