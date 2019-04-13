@@ -18,13 +18,23 @@ Test on synthetized images : `FBSD -random` (requires some patience)
 | Detected blurred segments per image  | 25.35 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.17 | 24.35 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 5.03  |
 | Detected long (> 40 pixels) blurred segments per image  | 10.41 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.84 | 11.14 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.92 |
 | Undetected input segments per image  | 2.53 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.54 | 0.64 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.91 |
-| Precision (%) : P = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)=#D  | 72.76 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 9.69 | 79.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.03 |
+| Precision (%) : P = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#D  | 72.76 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 9.69 | 79.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.03 |
 | Recall (ratio of true detection) (%) : R = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#S  | 89.20 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.94 | 90.08 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.77 |
 | F-measure (harmonic mean) (%) : F = 2 x P x R /(P + R)  | 79.85 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.78 | 84.17 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.17 |
 | Width difference (in pixels) to matched input segment  | 0.92 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.31 | 0.76 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.23 |
 | Angle difference (in degrees) to matched input segment  | 1.48 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.42 | 1.05 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.80 |
 
 ## 2. Experimentations on real images
+FIGURE HERE 
+
+| Measure M  | T | N | L | W | 
+| :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
+| Old method (M_old) on the image  | 29.51 ms | 306 segments | 38.58 pixels | 2.47 pixels |
+| New method (M_new) on the image  | 25.85 ms | 352 segments | 33.25 pixels | 2.17 pixels |
+| **M_old/M_new (%)** |
+|   &nbsp;&nbsp;&nbsp; on the image  | 29.51 ms | 306 segments | 38.58 pixels | 2.47 pixels |
+|   &nbsp;&nbsp;&nbsp; on the set od test images  | 25.85 ms | 352 segments | 33.25 pixels | 2.17 pixels |
+|   &nbsp;&nbsp;&nbsp; on CannyLines images  | 25.85 ms | 352 segments | 33.25 pixels | 2.17 pixels |
 
 # Application control
 
