@@ -15,7 +15,7 @@ const int VMap::TYPE_FULL_BLACK_HAT = 6;
 const int VMap::TYPE_FULL_MORPHO = 7;
 
 const int VMap::NEAR_SQ_ANGLE = 80;  // 80% (roughly 25 degrees)
-const int VMap::DEFAULT_GRADIENT_THRESHOLD = 33;
+const int VMap::DEFAULT_GRADIENT_THRESHOLD = 20;
 const int VMap::DEFAULT_GRADIENT_RESOLUTION = 100;
 
 const int VMap::MAX_BOWL = 20;
@@ -109,7 +109,7 @@ VMap::VMap (int width, int height, int *data, int type)
       imap[i] = (int) sqrt (map[i].norm2 ());
     gmagThreshold *= gradientThreshold;
   }
-  else // type == TYPE_SOBEL_3X3
+  else if (type == TYPE_SOBEL_3X3)
   {
     buildGradientMap (data);
     for (int i = 0; i < width * height; i++)
@@ -205,7 +205,7 @@ VMap::VMap (int width, int height, int **data, int type)
       imap[i] = (int) sqrt (map[i].norm2 ());
     gmagThreshold *= gradientThreshold;
   }
-  else // type == TYPE_SOBEL_3X3
+  else if (type == TYPE_SOBEL_3X3)
   {
     buildGradientMap (data);
     for (int i = 0; i < width * height; i++)
@@ -234,7 +234,7 @@ void VMap::init ()
   for (int i = 0; i < width * height; i++) mask[i] = false;
   masking = false;
   angleThreshold = NEAR_SQ_ANGLE;
-  orientedGradient = false;
+  orientedGradient = true;
   bowl = new Vr2i[MAX_BOWL];
   bowl[0] = Vr2i (1, 0);
   bowl[1] = Vr2i (0, 1);

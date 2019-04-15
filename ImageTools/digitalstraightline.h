@@ -110,6 +110,14 @@ public:
   }
 
   /**
+   * \brief Returns the standard width : |a| + |b|.
+   */
+  inline int standard () const
+  {
+    return (a + (b < 0 ? -b : b));
+  }
+
+  /**
    * \brief Returns the lower of the digital straight line : min (|a|,|b|).
    */
   inline int antiperiod () const

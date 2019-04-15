@@ -177,3 +177,26 @@ DigitalStraightSegment *DigitalStraightSegment::erosion (int num, int den) const
   return (new DigitalStraightSegment (a, b, c + (nu - newwidth) / 2,
                                       newwidth, min, max));
 }
+
+
+DigitalStraightSegment *DigitalStraightSegment::dilation (
+                                                   int num, int den) const
+{
+  int newwidth = nu + (num * period ()) / den;
+  return (new DigitalStraightSegment (a, b, c + (nu - newwidth) / 2,
+                                      newwidth, min, max));
+}
+
+
+DigitalStraightSegment *DigitalStraightSegment::dilation (int radius) const
+{
+  return (new DigitalStraightSegment (a, b, c - radius,
+                                      nu + 2 * radius, min, max));
+}
+
+
+void DigitalStraightSegment::dilate (int radius)
+{
+  nu += 2 * radius;
+  c -= radius;
+}

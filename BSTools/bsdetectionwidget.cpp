@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 #include "bsdetectionwidget.h"
 
 using namespace std;
@@ -35,6 +36,8 @@ BSDetectionWidget::BSDetectionWidget (QWidget *parent)
   // strucview = NULL;
   // profileview = NULL;
   // idetview = NULL;
+  // cannyview = NULL;
+  // yorkview = NULL;
 
   // Sets initial user outputs parameters
   verbose = false;
@@ -69,6 +72,8 @@ BSDetectionWidget::~BSDetectionWidget ()
   // if (strucview != NULL) delete strucview;
   // if (profileview != NULL) delete profileview;
   // if (idetview != NULL) delete idetview;
+  // if (cannyview != NULL) delete cannyview;
+  // if (yorkview != NULL) delete yorkview;
 }
 
 
@@ -957,6 +962,14 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
   {
     if (idetview->processKeyEvent (event)) extract ();
   }
+  else if (yorkview != NULL && yorkview->isActiveWindow ())
+  {
+    if (yorkview->processKeyEvent (event)) extract ();
+  }
+  else if (cannyview != NULL && cannyview->isActiveWindow ())
+  {
+    if (cannyview->processKeyEvent (event)) extract ();
+  }
   */
 }
 
@@ -1353,6 +1366,9 @@ void BSDetectionWidget::writeDetectionStatus ()
     cout << "Extraction : two few points at final detection." << endl;
   else if (res == BSDetector::RESULT_FINAL_TOO_SPARSE)
     cout << "Extraction : unsuccessful density test at final detection."
+         << endl;
+  else if (res == BSDetector::RESULT_FINAL_TOO_SMALL)
+    cout << "Extraction : unsuccessful spread test at final detection."
          << endl;
   else if (res == BSDetector::RESULT_FINAL_TOO_MANY_OUTLIERS)
     cout << "Extraction : unsuccessful filter test at final detection."

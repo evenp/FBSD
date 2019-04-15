@@ -27,6 +27,8 @@ public:
   /** Identifier for the preliminary detection step. */
   static const int STEP_PRELIM;
 
+  /** Extraction result : void input. */
+  static const int RESULT_VOID;
   /** Extraction result : successful extraction. */
   static const int RESULT_UNDETERMINED;
   /** Extraction result : successful extraction. */
@@ -51,6 +53,8 @@ public:
   static const int RESULT_FINAL_TOO_FEW;
   /** Extraction result : unsuccessful connectivity test at final detection. */
   static const int RESULT_FINAL_TOO_SPARSE;
+  /** Extraction result : unsuccessful spread test at final detection. */
+  static const int RESULT_FINAL_TOO_SMALL;
   /** Extraction result : unsuccessful filter test at final detection. */
   static const int RESULT_FINAL_TOO_MANY_OUTLIERS;
 
@@ -109,13 +113,14 @@ public:
    *         The first candidates that prolongates the segment are retained.
    * Step 4: Outliers pruning based on parameter space filtering.
    * Note : Multi-detection along a stroke requires an initial start point.
+   * Returns the detection status (RESULT_OK if successfull).
    * @param p1 First input point.
    * @param p2 Second input point.
    * @param centralp Set to true if the central point is provided.
    * @param pc Initial central point.
    */
-  void detect (const Pt2i &p1, const Pt2i &p2,
-               bool centralp = false, const Pt2i &pc = Pt2i ());
+  int detect (const Pt2i &p1, const Pt2i &p2,
+              bool centralp = false, const Pt2i &pc = Pt2i ());
 
   /**
    * \brief Detects a blurred segment between two input points.
@@ -128,13 +133,14 @@ public:
    * Step 3: id. step 2.
    *         The directional scan is oriented on the segment of step 2.
    * Note : Multi-detection along a stroke requires an initial start point.
+   * Returns the detection status (RESULT_OK if successfull).
    * @param p1 First input point.
    * @param p2 Second input point.
    * @param centralp Set to true if the central point is provided.
    * @param pc Initial central point.
    */
-  void olddetect (const Pt2i &p1, const Pt2i &p2,
-                  bool centralp = false, const Pt2i &pc = Pt2i ());
+  int olddetect (const Pt2i &p1, const Pt2i &p2,
+                 bool centralp = false, const Pt2i &pc = Pt2i ());
 
   /**
    * \brief Returns the detected blurred segment at given step.
@@ -640,6 +646,12 @@ private :
   bool finalDensityTestOn;
   /** Length test modality after final detection. */
   bool finalLengthTestOn;
+  /** Spread test modality after final detection. */
+  bool finalSpreadTestOn;
+  /** Spread test min value. */
+  int finalSpreadMin;
+  /** Count of small BS eliminated by the spread test. */
+  int nbSmallBS;
   /** Segment multi-selection modality status. */
   bool multiSelection;
   /** Count of trials in a multi-detection. */

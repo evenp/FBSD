@@ -74,6 +74,25 @@ public:
    */
   DigitalStraightSegment *erosion (int num, int den) const;
 
+  /**
+   * \brief Returns a dilation of the segment.
+   * @param num Dilation value numerator.
+   * @param den Dilation value denominator.
+   */
+  DigitalStraightSegment *dilation (int num, int den) const;
+
+  /**
+   * \brief Returns a dilated segment of the given radius.
+   * @param radius Dilation radius.
+   */
+  DigitalStraightSegment *dilation (int radius) const;
+
+  /**
+   * \brief Dilates the segment of the given radius.
+   * @param radius Dilation radius.
+   */
+  void dilate (int radius);
+
 
 protected:
 

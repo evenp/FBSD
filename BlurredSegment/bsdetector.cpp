@@ -2,11 +2,12 @@
 //#include "linespacefilter.h"
 
 
-const string BSDetector::VERSION = "0.1.5";
+const string BSDetector::VERSION = "0.2.0";
 const int BSDetector::STEP_FINAL = 0;
 const int BSDetector::STEP_INITIAL = 1;
 const int BSDetector::STEP_PRELIM = 2;
 
+const int BSDetector::RESULT_VOID = -2;
 const int BSDetector::RESULT_UNDETERMINED = -1;
 const int BSDetector::RESULT_OK = 0;
 const int BSDetector::RESULT_PRELIM_NO_DETECTION = 1;
@@ -19,7 +20,8 @@ const int BSDetector::RESULT_INITIAL_CLOSE_ORIENTATION = 15;
 const int BSDetector::RESULT_FINAL_NO_DETECTION = 21;
 const int BSDetector::RESULT_FINAL_TOO_FEW = 22;
 const int BSDetector::RESULT_FINAL_TOO_SPARSE = 23;
-const int BSDetector::RESULT_FINAL_TOO_MANY_OUTLIERS = 24;
+const int BSDetector::RESULT_FINAL_TOO_SMALL = 24;
+const int BSDetector::RESULT_FINAL_TOO_MANY_OUTLIERS = 25;
 
 const int BSDetector::DEFAULT_FAST_TRACK_SCAN_WIDTH = 16;
 const int BSDetector::DEFAULT_FINE_TRACK_MAX_WIDTH = 3;
@@ -66,6 +68,9 @@ BSDetector::BSDetector ()
   densityTestOn = true;
   finalDensityTestOn = false;
   finalLengthTestOn = false;
+  finalSpreadTestOn = true;
+  finalSpreadMin = 30;
+  // nbSmallBS = 0;
   multiSelection = false;
   autodet = false;
   autoResol = DEFAULT_AUTO_RESOLUTION;
@@ -112,6 +117,7 @@ void BSDetector::detectAll ()
 
   bool isnext = true;
   nbtrials = 0;
+  // nbSmallBS = 0;
   int width = gMap->getWidth ();
   int height = gMap->getHeight ();
   for (int x = width / 2; isnext && x > 0; x -= autoResol)
@@ -123,6 +129,7 @@ void BSDetector::detectAll ()
   for (int y = height / 2 + autoResol; isnext && y < height - 1; y += autoResol)
     isnext = runMultiDetection (Pt2i (0, y), Pt2i (width - 1, y));
   if (maxtrials > (int) (mbsf.size ())) maxtrials = 0;
+  // cout << nbSmallBS << " petits BS elimines" << endl;
 
   gMap->setMasking (false);
 }
@@ -137,6 +144,7 @@ void BSDetector::detectAllWithBalancedXY ()
 
   bool isnext = true;
   nbtrials = 0;
+  // nbSmallBS = 0;
   int width = gMap->getWidth ();
   int height = gMap->getHeight ();
   int xg = width / 2, yb = height / 2;
@@ -170,6 +178,7 @@ void BSDetector::detectAllWithBalancedXY ()
     }
   }
   if (maxtrials > (int) (mbsf.size ())) maxtrials = 0;
+  // cout << nbSmallBS << " petits BS elimines" << endl;
   gMap->setMasking (false);
 }
 
@@ -183,13 +192,15 @@ void BSDetector::detectSelection (const Pt2i &p1, const Pt2i &p2)
     gMap->setMasking (true);
     gMap->clearMask ();
     nbtrials = 0;
+    // nbSmallBS = 0;
     runMultiDetection (p1, p2);
+    // cout << nbSmallBS << " petits BS elimines" << endl;
     if (maxtrials > (int) (mbsf.size ())) maxtrials = 0;
     gMap->setMasking (false);
   }
   else
-    if (oldp) olddetect (p1, p2);
-    else detect (p1, p2);
+    if (oldp) resultValue = olddetect (p1, p2);
+    else resultValue = detect (p1, p2);
 }
 
 
@@ -224,9 +235,10 @@ bool BSDetector::runMultiDetection (const Pt2i &p1, const Pt2i &p2)
       if (edgeDirection != 0) edgeDirection = 1;
       while (isnext && edgeDirection >= -1)
       {
-        if (oldp) olddetect (p1, p2, true, ptstart);
-        else detect (p1, p2, true, ptstart);
-        if (bsf != NULL)
+        int res = RESULT_VOID;
+        if (oldp) res = olddetect (p1, p2, true, ptstart);
+        else res = detect (p1, p2, true, ptstart);
+        if (res == RESULT_OK)
         {
           gMap->setMask (bsf->getAllPoints ());
           mbsf.push_back (bsf);
@@ -243,17 +255,17 @@ bool BSDetector::runMultiDetection (const Pt2i &p1, const Pt2i &p2)
 }
 
 
-void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
-                            bool centralp, const Pt2i &pc)
+int BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
+                           bool centralp, const Pt2i &pc)
 {
   // Entry check
   //------------
   if (p1.equals (p2)
-      || ((! centralp) && p1.chessboard (p2) < BSTracker::MIN_SCAN)) return;
+      || ((! centralp) && p1.chessboard (p2) < BSTracker::MIN_SCAN))
+    return RESULT_VOID;
 
   // Clearance
   //----------
-  resultValue = RESULT_UNDETERMINED;
   bst1->clear ();
   bst2->clear ();
   if (bsini != NULL) delete bsini;
@@ -271,11 +283,8 @@ void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
   bsini = bst1->fastTrack (DEFAULT_FAST_TRACK_SCAN_WIDTH / 4,
                            inip1, inip2, iniwidth, inipc);
   if (bsini == NULL || bsini->size () < bsMinSize)
-  {
-    resultValue = (bsini == NULL ? RESULT_INITIAL_NO_DETECTION
-                                 : RESULT_INITIAL_TOO_FEW);
-    return;
-  }
+    return (bsini == NULL ? RESULT_INITIAL_NO_DETECTION
+                          : RESULT_INITIAL_TOO_FEW);
 
   // Density test
   //-------------
@@ -288,10 +297,7 @@ void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
     if (mydrlf < 0) mydrlf = -mydrlf; // Case of horizontal P1P2
     int expansion = 1 + mydrlf;
     if (bsini->size () < expansion / 2)
-    {
-      resultValue = RESULT_INITIAL_TOO_SPARSE;
-      return;
-    }
+      return RESULT_INITIAL_TOO_SPARSE;
   }
 */
 
@@ -299,10 +305,7 @@ void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
   //-------------------------------------------
   Vr2i bsinidir = bsini->getSupportVector();
   if (bsinidir.orientedAs (inip1.vectorTo (inip2)))
-  {
-    resultValue = RESULT_INITIAL_CLOSE_ORIENTATION;
-    return;
-  }
+    return RESULT_INITIAL_CLOSE_ORIENTATION;
 
   // Gradient reference selection
   //-----------------------------
@@ -320,11 +323,7 @@ void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
   bsf = bstold->fineTrack (fmaxWidth, pCenter, bsinidir,
                            4 * fmaxWidth, gRef);
   if (bsf == NULL || bsf->size () < bsMinSize)
-  {
-    resultValue = (bsf == NULL ? RESULT_FINAL_NO_DETECTION
-                               : RESULT_FINAL_TOO_FEW);
-    return;
-  }
+    return (bsf == NULL ? RESULT_FINAL_NO_DETECTION : RESULT_FINAL_TOO_FEW);
 
   // Scan recentering and fitting
   //-----------------------------
@@ -339,10 +338,12 @@ void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
                                             4 * fmaxWidth, gRef);
   if (bsf2 == NULL || bsf2->size () < bsMinSize)
   {
-    resultValue = (bsf2 == NULL ? RESULT_FINAL_NO_DETECTION
-                                : RESULT_FINAL_TOO_FEW);
-    if (bsf2 != NULL) delete bsf2;
-    return;
+    if (bsf2 != NULL)
+    {
+      delete bsf2;
+      return RESULT_FINAL_TOO_FEW;
+    }
+    else return RESULT_FINAL_NO_DETECTION;
   }
   else
   {
@@ -357,12 +358,7 @@ void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
     DigitalStraightSegment *dss = bsf->getSegment ();
     if (dss == NULL || (int) (bsf->getAllPoints().size ())
                        < (10 * dss->period ()) / dss->width ())
-    {
-      resultValue = RESULT_FINAL_TOO_SPARSE;
-      delete bsf;
-      bsf = NULL;
-      return;
-    }
+      return RESULT_FINAL_TOO_SPARSE;
   }
 
   // New density test
@@ -375,12 +371,7 @@ void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
     if (mydrlf < 0) mydrlf = -mydrlf; // Case of horizontal P1P2
     int expansion = 1 + mydrlf;
     if (bsf->size () < expansion / 2)
-    {
-      resultValue = RESULT_FINAL_TOO_SPARSE;
-      delete bsf;
-      bsf = NULL;
-      return;
-    }
+      return RESULT_FINAL_TOO_SPARSE;
   }
 
   // Connected components analysis
@@ -390,40 +381,30 @@ void BSDetector::olddetect (const Pt2i &p1, const Pt2i &p2,
     int bsccp = bsf->countOfConnectedPoints (ccMinSize);
     int bssize = bsf->getAllPoints().size ();
     if (bsccp < bssize / 2)
-    {
-      resultValue = RESULT_FINAL_TOO_SPARSE;
-      delete bsf;
-      bsf = NULL;
-      return;
-    }
+      return RESULT_FINAL_TOO_SPARSE;
 
 /*
     if (bssize < 20 || bsf->countOfConnectedComponents (bssize / 4) == 0)
-    {
-      resultValue = RESULT_FINAL_TOO_SPARSE;
-      delete bsf;
-      bsf = NULL;
-      return;
-    }
+      return RESULT_FINAL_TOO_SPARSE;
 */
   }
 
-  resultValue = RESULT_OK;
+  return RESULT_OK;
 }
 
 
-void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
-                         bool centralp, const Pt2i &pc)
+int BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
+                        bool centralp, const Pt2i &pc)
 {
   // Entry check
   //------------
   if (p1.equals (p2)
-      || ((! centralp) && p1.chessboard (p2) < BSTracker::MIN_SCAN)) return;
+      || ((! centralp) && p1.chessboard (p2) < BSTracker::MIN_SCAN))
+    return RESULT_VOID;
 
 
   // Clearance
   //----------
-  resultValue = RESULT_UNDETERMINED;
   if (prelimDetectionOn) bst0->clear ();
   bst1->clear ();
   bst2->clear ();
@@ -448,11 +429,8 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
     bspre = bst0->fastTrack (fmaxWidth + imaxMargin,
                              prep1, prep2, prewidth, prepc);
     if (bspre == NULL || bspre->size () < bsMinSize)
-    {
-      resultValue = (bspre == NULL ? RESULT_PRELIM_NO_DETECTION
-                                   : RESULT_PRELIM_TOO_FEW);
-      return;
-    }
+      return (bspre == NULL ? RESULT_PRELIM_NO_DETECTION
+                            : RESULT_PRELIM_TOO_FEW);
 
     Vr2i v0 = bspre->getSupportVector ();
     int l = v0.chessboard ();
@@ -481,11 +459,8 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
   bsini = bst1->fastTrack (fmaxWidth + imaxMargin,
                            inip1, inip2, iniwidth, inipc);
   if (bsini == NULL || bsini->size () < bsMinSize)
-  {
-    resultValue = (bsini == NULL ? RESULT_INITIAL_NO_DETECTION
-                                 : RESULT_INITIAL_TOO_FEW);
-    return;
-  }
+    return (bsini == NULL ? RESULT_INITIAL_NO_DETECTION
+                          : RESULT_INITIAL_TOO_FEW);
 
   // Density test
   //-------------
@@ -497,10 +472,7 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
     if (mydrlf < 0) mydrlf = -mydrlf; // Case of horizontal P1P2
     int expansion = 1 + mydrlf;
     if (bsini->size () < expansion / 2)
-    {
-      resultValue = RESULT_INITIAL_TOO_SPARSE;
-      return;
-    }
+      return RESULT_INITIAL_TOO_SPARSE;
   }
 
   // Filtering the initial segment
@@ -515,19 +487,13 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
     }
   }
   if (bsini->size () < bsMinSize)
-  {
-    resultValue = RESULT_INITIAL_TOO_MANY_OUTLIERS;
-    return;
-  }
+    return RESULT_INITIAL_TOO_MANY_OUTLIERS;
 
   // Orientation test for automatic extractions
   //-------------------------------------------
   Vr2i bsinidir = bsini->getSupportVector();
   if (bsinidir.orientedAs (inip1.vectorTo (inip2)))
-  {
-    resultValue = RESULT_INITIAL_CLOSE_ORIENTATION;
-    return;
-  }
+    return RESULT_INITIAL_CLOSE_ORIENTATION;
   
   // Gradient reference selection
   //-----------------------------
@@ -551,10 +517,18 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
   //---------------------------------------------------------------------
   bsf = bst2->fineTrack (bswidth, pCenter, bsinidir, 2 * bswidth, gRef);
   if (bsf == NULL || bsf->size () < bsMinSize)
+    return (bsf == NULL ? RESULT_FINAL_NO_DETECTION : RESULT_FINAL_TOO_FEW);
+
+  // Spread test
+  //------------
+  if (finalSpreadTestOn)
   {
-    resultValue = (bsf == NULL ? RESULT_FINAL_NO_DETECTION
-                               : RESULT_FINAL_TOO_FEW);
-    return;
+    // DigitalStraightSegment *dss = bsf->getSegment ();
+    if ((int) (bsf->getAllPoints().size ()) < finalSpreadMin)
+    {
+      // nbSmallBS ++;
+      return RESULT_FINAL_TOO_SMALL;
+    }
   }
 
   // Length test
@@ -565,12 +539,7 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
     if ((int) (bsf->getAllPoints().size ())
         < (3 * dss->width ()) / dss->period ())
     // if ((int) (bsf->getAllPoints().size ()) < 10)
-    {
-      resultValue = RESULT_FINAL_TOO_SPARSE;
-      delete bsf;
-      bsf = NULL;
-      return;
-    }
+      return RESULT_FINAL_TOO_SPARSE;
   }
 
   // New density test
@@ -583,12 +552,7 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
     if (mydrlf < 0) mydrlf = -mydrlf; // Case of horizontal P1P2
     int expansion = 1 + mydrlf;
     if (expansion < 20 && bsf->size () < (expansion * 4) / 5)
-    {
-      resultValue = RESULT_FINAL_TOO_SPARSE;
-      delete bsf;
-      bsf = NULL;
-      return;
-    }
+      return RESULT_FINAL_TOO_SPARSE;
   }
 
   // Connected components analysis */
@@ -598,21 +562,11 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
     int bsccp = bsf->countOfConnectedPoints (ccMinSize);
     int bssize = bsf->getAllPoints().size ();
     if (bsccp < bssize / 2)
-    {
-      resultValue = RESULT_FINAL_TOO_SPARSE;
-      delete bsf;
-      bsf = NULL;
-      return;
-    }
+      return RESULT_FINAL_TOO_SPARSE;
 
 /*
     if (bssize < 20 || bsf->countOfConnectedComponents (bssize / 2) == 0)
-    {
-      resultValue = RESULT_FINAL_TOO_SPARSE;
-      delete bsf;
-      bsf = NULL;
-      return;
-    }
+      return RESULT_FINAL_TOO_SPARSE;
 */
   }
 
@@ -624,13 +578,13 @@ void BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
     BlurredSegment *fbsf = lsf2->filter (bsf);
     if (fbsf != NULL)
     {
-      resultValue = RESULT_FINAL_TOO_MANY_OUTLIERS;
       delete bsf;
       bsf = fbsf;
     }
+    else return RESULT_FINAL_TOO_MANY_OUTLIERS;
   }
 
-  resultValue = RESULT_OK;
+  return RESULT_OK;
 }
 
 
