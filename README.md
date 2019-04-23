@@ -21,6 +21,17 @@ measures. This bias was first estimated using 1000 images containing only one
 input segment (no possible interaction) and the found value (1.4 pixel) was taken
 into account in the test. The results are given in the following table.
 
+![Figure](Images/statsExample.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/statsoldBounds.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/statsnewBounds.png?raw=true)
+
+**Figure: Evaluation on synthesized images: (left) one of the test images, (middle) output enclosing blurred
+segments from the old detector and (right) output enclosing blurred segments from the new detector.**
+
+Automatic detection on real images: an input image (a), the segments found
+by the old detector (b) and those found by the new detector (c), and a detail of the
+image (d) and the enclosing digital segments for both old (e) and new (f) detectors.**
+
 | Detector  | Old | New |
 | :---          |     :---:     |     :---:     | 
 | Detected blurred segments per image  | 25.35 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.17 | 24.35 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 5.03  |
