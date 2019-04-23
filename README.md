@@ -22,6 +22,9 @@ input segment (no possible interaction) and the found value (1.4 pixel) was take
 into account in the test. The results are given in the following table.
 
 ![Figure](Images/statsExample.png?raw=true)
+![Figure](Images/statsnewBounds.png?raw=true)
+![Figure](Images/statsoldBounds.png?raw=true)
+
 **Figure: Automatic detection on real images: an input image (a), the segments found
 by the old detector (b) and those found by the new detector (c), and a detail of the
 image (d) and the enclosing digital segments for both old (e) and new (f) detectors.**
