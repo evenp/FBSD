@@ -21,8 +21,8 @@ measures. This bias was first estimated using 1000 images containing only one
 input segment (no possible interaction) and the found value (1.4 pixel) was taken
 into account in the test. The results are given in the following table.
 
-![Figure](Images/statsExample.png?raw=true) &nbsp;&nbsp;&nbsp;
-![Figure](Images/statsoldBounds.png?raw=true) &nbsp;&nbsp;&nbsp;
+![Figure](Images/statsExample.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/statsoldBounds.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
 ![Figure](Images/statsnewBounds.png?raw=true)
 
 **Figure: Evaluation on synthesized images: (left) one of the test images, (middle) output enclosing blurred
