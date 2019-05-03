@@ -25,11 +25,11 @@ and the found value (1.4 pixel) was taken into account in the test. Results are 
 | :---          |     :---:     |     :---:     | 
 | Detected blurred segments per image  | 17.06 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.22 | 16.83 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.11  |
 | Detected long (> 40 pixels) blurred segments per image  | 11.24 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.94 | 11.36 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.97 |
-| Undetected input segments per image  | 2.53 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.54 | 0.64 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.91 |
+| Undetected input segments per image  | 0.152 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.43 | 0.003 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.05 |
 | Precision (%) : P = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#D  | 80.46 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.22 | 83.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.04 |
 | Recall (ratio of true detection) (%) : R = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#S  | 90.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.30 | 91.15 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.52 |
 | F-measure (harmonic mean) (%) : F = 2 x P x R /(P + R)  | 84.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.42 | 87.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.59 |
-| Width difference (in pixels) to matched input segment  | 0.49 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.27 | 0.36 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.22 |
+| Thickness difference (in pixels) to matched input segment  | 0.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.24 | 0.59 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.19 |
 | Angle difference (in degrees) to matched input segment  | 0.61 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.66 | 0.57 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.62 |
 
 ## 2. Experimentations on real images
