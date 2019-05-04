@@ -9,12 +9,7 @@ const int BSTracker::MIN_SCAN = 8;
 const int BSTracker::DEFAULT_MAX_SCAN = 32;
 const int BSTracker::DEFAULT_FITTING_DELAY = 20;
 
-const int BSTracker::DEFAULT_THICKENNING_LIMIT = 20;
-
-const int BSTracker::DEFAULT_THINNING_DELAY = 20;
-const int BSTracker::DEFAULT_THINNING_SPEED = 2;
-const int BSTracker::DEFAULT_THINNING_REACH = 50;
-const int BSTracker::DEFAULT_THINNING_RESOLUTION = 1000;
+const int BSTracker::DEFAULT_ASSIGNED_THICKNESS_CONTROL_DELAY = 20;
 
 const int BSTracker::FAILURE_NO_START = 1;
 const int BSTracker::FAILURE_IMAGE_BOUND_ON_RIGHT = 2;
@@ -36,13 +31,9 @@ BSTracker::BSTracker ()
   orthoScan = false;
   trackCrosswise = false;
 
-  thickenningOn = true;
-  thickenningLimit = DEFAULT_THICKENNING_LIMIT;
+  assignedThicknessControlOn = true;
+  assignedThicknessControlDelay = DEFAULT_ASSIGNED_THICKNESS_CONTROL_DELAY;
 
-  thinningOn = false;
-  thinningDelay = DEFAULT_THINNING_DELAY;
-  thinningSpeed.set (DEFAULT_THINNING_SPEED, 100);
-  thinningReach.set (100 + DEFAULT_THINNING_REACH, 100);
   gMap = NULL;
 
   maxScan = DEFAULT_MAX_SCAN;
@@ -249,14 +240,10 @@ BlurredSegment *BSTracker::fineTrack (int bsMaxWidth,
 
   BlurredSegmentProto bs (bsMaxWidth, pix[cand[0]]);
 
-  // Handles thickenning
-  bool thickenOn = thickenningOn;
+  // Handles assigned thickness control
+  bool atcOn = assignedThicknessControlOn;
   int stableWidthCount = 0;
-
-  // Handles thinning
   int count = 0;
-  AbsRat maxw (bsMaxWidth * DEFAULT_THINNING_RESOLUTION,
-               DEFAULT_THINNING_RESOLUTION);
 
   // Extends the segment
   lscan = 0;
@@ -268,42 +255,22 @@ BlurredSegment *BSTracker::fineTrack (int bsMaxWidth,
   bool added = false;
   bool scanningRight = true;
   bool scanningLeft = true;
-  bool thon = thinningOn;
 
   while (scanningRight || scanningLeft)
   {
     count ++;
-    AbsRat sw = bs.minimalWidth ();
+    AbsRat sw = bs.strictThickness ();
 
-    // Handles thickenning
-    if (thickenOn && stableWidthCount >= thickenningLimit)
+    // Handles assigned thickness control
+    if (atcOn && stableWidthCount >= assignedThicknessControlDelay)
     {
-      AbsRat finalWidth (sw.sumHalf ());
+      AbsRat finalWidth (bs.digitalThickness().sumHalf ());
       if (finalWidth.lessThan (bs.getMaxWidth ())) bs.setMaxWidth (finalWidth);
-      thickenOn = false;
-    }
-
-    // Handles thinning
-    if (thon)
-    {
-      if (count > thinningDelay)
-      {
-        AbsRat oldmaxw (maxw);
-        maxw.attractsTo (sw, thinningSpeed);
-        AbsRat msw (sw);
-        msw.mult (thinningReach);
-        if (maxw.lessThan (msw))
-        {
-          maxw.sticksTo (msw);
-          if (oldmaxw.lessThan (maxw)) maxw.set (oldmaxw);
-          thon = false;  // thinning deactivation
-        }
-        bs.setMaxWidth (maxw);
-      }
+      atcOn = false;
     }
 
     // Resets the scan stripe
-    if (dynamicScans && count > fittingDelay && bs.getLine () != NULL)
+    if (dynamicScans && count > fittingDelay && bs.isLineable ())
     {
       // Stops the detection if the segment gets crosswise
       if (count == fittingDelay + 1)
@@ -321,7 +288,7 @@ BlurredSegment *BSTracker::fineTrack (int bsMaxWidth,
       bs.getLine()->getMedialAxis (ppa, ppb, ppc);
       ds->bindTo (ppa, ppb, ppc);
     }
-    else if (trackCrosswise && count > 3 && bs.getLine () != NULL)
+    else if (trackCrosswise && count > 3 && bs.isLineable ())
     {
       Vr2i dirn = bs.getSupportVector ();
       if (4 * dirn.squaredScalarProduct (scandir)
@@ -357,7 +324,8 @@ BlurredSegment *BSTracker::fineTrack (int bsMaxWidth,
         stableWidthCount ++;
         if (added)
         {
-          if (sw.lessThan (bs.minimalWidth ())) stableWidthCount = 0;
+          if (atcOn
+              && sw.lessThan (bs.strictThickness ())) stableWidthCount = 0;
           rscan = count;
           if (rstop == 0) rstart = 0;
           else
@@ -405,7 +373,8 @@ BlurredSegment *BSTracker::fineTrack (int bsMaxWidth,
         stableWidthCount ++;
         if (added)
         {
-          if (sw.lessThan (bs.minimalWidth ())) stableWidthCount = 0;
+          if (atcOn
+              && sw.lessThan (bs.strictThickness ())) stableWidthCount = 0;
           lscan = count;
           if (lstop == 0) lstart = 0;
           else

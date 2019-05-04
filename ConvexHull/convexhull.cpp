@@ -114,20 +114,19 @@ bool ConvexHull::moveLastPoint (const Pt2i &pix)
 }
 
 
-AbsRat ConvexHull::rationalThickness () const
+AbsRat ConvexHull::thickness () const
 {
-  AbsRat aphw = aph.rationalWidth ();
-  AbsRat apvw = apv.rationalWidth ();
+  AbsRat aphw = aph.thickness ();
+  AbsRat apvw = apv.thickness ();
   return (apvw.lessThan (aphw) ? apvw : aphw);
 }
 
 
 void ConvexHull::antipodalEdgeAndVertex (Pt2i &s, Pt2i &e, Pt2i &v) const
 {
-  int n1, d1, n2, d2;
-  aph.width (n1, d1);
-  apv.width (n2, d2);
-  const Antipodal *ap = ((n2 * d1 < n1 * d2) ? &apv : &aph);
+  AbsRat aphw = aph.thickness ();
+  AbsRat apvw = apv.thickness ();
+  const Antipodal *ap = (apvw.lessThan (aphw) ? &apv : &aph);
   s.set (*(ap->edgeStart ()));
   e.set (*(ap->edgeEnd ()));
   v.set (*(ap->vertex ()));

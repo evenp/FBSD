@@ -213,6 +213,12 @@ public:
    */
   const Pt2i centerOfIntersection (Pt2i p1, Pt2i p2) const;
 
+  /**
+   * \brief Returns the squared Euclidean thickness of the digital line.
+   */
+  const AbsRat squaredEuclideanThickness () const {
+    return (AbsRat (nu * nu, a * a + b * b)); }
+
 
 protected:
 

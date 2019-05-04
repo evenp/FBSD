@@ -8,10 +8,6 @@
 BSWindow::BSWindow (int *val)
 {
   Q_UNUSED (val);
-  showIdet = false;
-  showProf = false;
-  // showAccu = false;
-  showSeg = false;
   gradType = VMap::TYPE_SOBEL_5X5;
   detectionWidget = new BSDetectionWidget;
   setCentralWidget (detectionWidget);
@@ -25,10 +21,6 @@ BSWindow::BSWindow (int *val)
 
 BSWindow::BSWindow ()
 {
-  showIdet = false;
-  showProf = false;
-  // showAccu = false;
-  showSeg = false;
   gradType = 0;
   detectionWidget = new BSDetectionWidget;
   setCentralWidget (detectionWidget);
@@ -49,10 +41,6 @@ void BSWindow::setFile (QString fileName)
 
 void BSWindow::runOptions ()
 {
-  // if (showIdet) detectionWidget->switchIdetAnalyzer ();
-  // if (showProf) detectionWidget->switchProfileAnalyzer ();
-  // if (showAccu) detectionWidget->switchAccuAnalyzer ();
-  // if (showSeg) detectionWidget->switchPixelAnalyzer ();
 }
 
 
@@ -64,10 +52,6 @@ void BSWindow::runTest ()
 
 void BSWindow::closeEvent (QCloseEvent *event)
 {
-  // detectionWidget->closeIdetAnalyzer ();
-  // detectionWidget->closeProfileAnalyzer ();
-  // detectionWidget->closeAccuAnalyzer ();
-  // detectionWidget->closePixelAnalyzer ();
   event->accept ();
 }
 

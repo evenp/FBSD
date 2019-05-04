@@ -113,7 +113,7 @@ int main (int argc, char *argv[])
   vector<BlurredSegment *> bss;
   BSDetector detector;
   detector.setGradientMap (gMap);
-  detector.setFineTracksMaxWidth (widthBS);
+  detector.setAssignedThickness (widthBS);
 
   if (with_points)
   {

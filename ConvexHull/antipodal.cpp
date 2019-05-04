@@ -64,7 +64,7 @@ void Antipodal::init (CHVertex *v1, CHVertex *v2, CHVertex *v3)
 }
 
 
-AbsRat Antipodal::rationalWidth () const
+AbsRat Antipodal::thickness () const
 {
   int den = ept2->get (iy) - ept1->get (iy);
   return (AbsRat (((vpt->get (ix) - ept1->get (ix)) * den
@@ -73,14 +73,17 @@ AbsRat Antipodal::rationalWidth () const
 }
 
 
-void Antipodal::width (int &num, int &den) const
+/*
+void Antipodal::thickness (int &num, int &den) const
 {
   den = ept2->get (iy) - ept1->get (iy);
-  if (den < 0) den = -den;
   num = (vpt->get (ix) - ept1->get (ix)) * den
-        - (vpt->get (iy) - ept1->get (iy)) * (ept2->get (ix) - ept1->get (ix));
+        - (vpt->get (iy) - ept1->get (iy))
+          * (ept2->get (ix) - ept1->get (ix));
   if (num < 0) num = -num;
+  if (den < 0) den = -den;
 }
+*/
 
 
 int Antipodal::remainder (CHVertex *v) const

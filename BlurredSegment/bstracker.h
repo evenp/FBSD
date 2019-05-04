@@ -179,35 +179,29 @@ public:
   inline void setDynamicScans (bool onOff) { dynamicScans = onOff; }
 
   /**
-   * \brief Returns if the thickenning control is activated.
+   * \brief Returns if the assigned thickness control is activated.
    */
-  inline bool isThickenningOn () const { return thickenningOn; }
+  inline bool isAssignedThicknessControlOn () const {
+    return assignedThicknessControlOn; }
 
   /**
-   * \brief Toggles the thickenning control.
+   * \brief Toggles the assigned thickness control.
    */
-  inline void toggleThickenning () { thickenningOn = ! thickenningOn; }
+  inline void toggleAssignedThicknessControl () {
+    assignedThicknessControlOn = ! assignedThicknessControlOn; }
 
   /**
-   * \brief Returns the thickenning limit.
+   * \brief Returns the assigned thickness control delay.
    */
-  inline int getThickenningLimit () const { return thickenningLimit; }
+  inline int getAssignedThicknessControlDelay () const {
+    return assignedThicknessControlDelay; }
 
   /**
-   * \brief Increments the thickenning limit.
+   * \brief Increments the assigned thickness control delay.
    */
-  inline void incThickenningLimit (int val) {
-    thickenningLimit += val; if (thickenningLimit < 1) thickenningLimit = 1; }
-
-  /**
-   * \brief Returns if the thinning is activated.
-   */
-  inline bool isThinningOn () const { return thinningOn; }
-
-  /**
-   * \brief Toggles the thinning strategy.
-   */
-  inline void toggleThinning () { thinningOn = ! thinningOn; }
+  inline void incAssignedThicknessControlDelay (int val) {
+    assignedThicknessControlDelay += val;
+    if (assignedThicknessControlDelay < 1) assignedThicknessControlDelay = 1; }
 
   /**
    * \brief Switches on or off the orthogonal scanning modality.
@@ -234,21 +228,8 @@ private :
   /* Count of points before activating the fitting on the detected segment. */
   static const int DEFAULT_FITTING_DELAY;
 
-  // Width thickenning default parameters.
-  /* Maximal count of points since last minimal width growing. */
-  static const int DEFAULT_THICKENNING_LIMIT;
-
-  // Width thinning default parameters.
-  /* Count of points before activating the width thinning. */
-  static const int DEFAULT_THINNING_DELAY;
-  /** Value which controls the width thinning speed.
-   * It is the percentage of width offset withdrawn from the width tolerence.
-   * Width offset = width tolerence - blurred segment width. */
-  static const int DEFAULT_THINNING_SPEED;
-  /** Minimal value of the percentage of width offset wrt segment width. */
-  static const int DEFAULT_THINNING_REACH;
-  /** Resolution of the max segment width when thinning. */
-  static const int DEFAULT_THINNING_RESOLUTION;
+  /* Maximal count of points before activating assigned thickness control. */
+  static const int DEFAULT_ASSIGNED_THICKNESS_CONTROL_DELAY;
 
   /** Segment stop information : no start point found. */
   static const int FAILURE_NO_START;
@@ -287,19 +268,10 @@ private :
   /** Crosswise segment detection modality. */
   bool trackCrosswise;
 
-  /** Segment thinning strategy. */
-  bool thinningOn;
-  /** Width thinning delay. */
-  int thinningDelay;
-  /** Width thinning speed : amount of thinning offset withdrawn. */
-  AbsRat thinningSpeed;
-  /** Minimal control width wrt detected segment width when thinning. */
-  AbsRat thinningReach;
-
   /** Segment thickening control modality. */
-  bool thickenningOn;
-  /** Count of expansion without width growing to stop the thickenning. */
-  int thickenningLimit;
+  bool assignedThicknessControlOn;
+  /** Count of stable point insertion before activation of ATC. */
+  int assignedThicknessControlDelay;
 
   /** Gradient map. */
   VMap *gMap;

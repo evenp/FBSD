@@ -68,6 +68,11 @@ public:
   void getPoints (vector<Pt2i> &pts) const;
 
   /**
+   * \brief Provides the naive central segment end points coordinates.
+   */
+  void naiveLine (AbsRat &x1, AbsRat &y1, AbsRat &x2, AbsRat &y2) const;
+
+  /**
    * \brief Returns an erosion of the segment.
    * @param num Erosion value numerator.
    * @param den Erosion value denominator.
@@ -92,6 +97,13 @@ public:
    * @param radius Dilation radius.
    */
   void dilate (int radius);
+
+  /**
+   * \brief Inquires if given point belongs to the segment with given tolerence.
+   * @param p Tested point.
+   * @param tol Count of naive lines tolerated outside.
+   */
+  bool contains (Pt2i p, int tol) const;
 
 
 protected:

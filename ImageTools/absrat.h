@@ -50,33 +50,45 @@ public:
    * @fn int numerator ()
    * \brief Returns the numerator of the absolute rational number.
    */
-  inline int numerator () const { return num; }
+  inline int numerator () const { return numer; }
 
   /**
    * @fn int denominator ()
    * \brief Returns the denominator of the absolute rational number.
    */
-  inline int denominator () const { return den; }
+  inline int denominator () const { return denom; }
+
+  /**
+   * @fn int num ()
+   * \brief Returns the numerator of the absolute rational number.
+   */
+  inline int num () const { return numer; }
+
+  /**
+   * @fn int den ()
+   * \brief Returns the denominator of the absolute rational number.
+   */
+  inline int den () const { return denom; }
 
   /**
    * @fn int floor ()
    * \brief Returns the nearest smaller integer value.
    */
-  inline int floor () const { return (num / den); }
+  inline int floor () const { return (numer / denom); }
 
   /**
    * @fn void set (const AbsRat &val)
    * \brief Sets the value of the rational number.
    * @value val New value of the rational number.
    */
-  inline void set (const AbsRat &val) { num = val.num; den = val.den; }
+  inline void set (const AbsRat &val) { numer = val.numer; denom = val.denom; }
 
   /**
    * @fn void set (int val)
    * \brief Sets the value of the rational number.
    * @value val New value of the rational number.
    */
-  inline void set (int val) { num = val; den = 1; }
+  inline void set (int val) { numer = val; denom = 1; }
 
   /**
    * @fn void set (int numerator, int denominator)
@@ -85,7 +97,7 @@ public:
    * @value denominator New denominator of the rational number.
    */
   inline void set (int numerator, int denominator) {
-    num = numerator; den = denominator; }
+    numer = numerator; denom = denominator; }
 
   /**
    * @fn bool equals (const AbsRat &r)
@@ -93,7 +105,7 @@ public:
    * @param r the given rational number.
    */
   inline bool equals (const AbsRat &r) const {
-    return (num * r.den == den * r.num); }
+    return (numer * r.denom == denom * r.numer); }
 
   /**
    * @fn bool lessThan (const AbsRat &r)
@@ -101,7 +113,7 @@ public:
    * @param r the given rational number.
    */
   inline bool lessThan (const AbsRat &r) const {
-    return (num * r.den < den * r.num); }
+    return (numer * r.denom < denom * r.numer); }
 
   /**
    * @fn bool lessEqThan (const AbsRat &r)
@@ -109,7 +121,7 @@ public:
    * @param r the given rational number.
    */
   inline bool lessEqThan (const AbsRat &r) const {
-    return (num * r.den <= den * r.num); }
+    return (numer * r.denom <= denom * r.numer); }
 
   /**
    * @fn bool greaterThan (const AbsRat &r)
@@ -117,7 +129,7 @@ public:
    * @param r the given rational number.
    */
   inline bool greaterThan (const AbsRat &r) const {
-    return (num * r.den > den * r.num); }
+    return (numer * r.denom > denom * r.numer); }
 
   /**
    * @fn bool greaterEqThan (const AbsRat &r)
@@ -125,7 +137,7 @@ public:
    * @param r the given rational number.
    */
   inline bool greaterEqThan (const AbsRat &r) const {
-    return (num * r.den >= den * r.num); }
+    return (numer * r.denom >= denom * r.numer); }
 
   /**
    * @fn void attractsTo (const AbsRat &val, const AbsRat &ratio)
@@ -159,23 +171,24 @@ public:
    * \brief Returns the sum of the rational with an integer value.
    * @param val integer value.
    */
-  inline AbsRat sum (int val) const { return (AbsRat (num + val * den, den)); }
+  inline AbsRat sum (int val) const {
+    return (AbsRat (numer + val * denom, denom)); }
 
   /**
    * @fn AbsRat sumHalf () const
    * \brief Returns the sum of the rational with 1/2.
    */
   inline AbsRat sumHalf () const {
-    return (den % 2 == 1 ? AbsRat (2 * num + den, 2 * den)
-                         : AbsRat (num + den / 2, den)); }
+    return (denom % 2 == 1 ? AbsRat (2 * numer + denom, 2 * denom)
+                         : AbsRat (numer + denom / 2, denom)); }
 
 
 protected:
 
   /** Positive numerator of the rational number. */
-  int num;
+  int numer;
   /** Positive denominator of the rational number (might be null). */
-  int den;
+  int denom;
 };
 
 #endif

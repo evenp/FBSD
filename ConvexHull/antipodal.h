@@ -44,11 +44,19 @@ public:
   /** Returns the leaning edge end of the antipodal pair. */
   inline CHVertex *edgeEnd () const { return ept2; }
 
-  /** Returns the horizontal or vertical width of the antipodal pair. */
-  AbsRat rationalWidth () const;
+  /**
+   * Returns the antipodal pair horizontal thickness.
+   * It is computed as the vertex horizontal distance to the edge.
+   */
+  AbsRat thickness () const;
 
-  /** Gets the rational main axis width of the antipodal pair. */
-  void width (int &num, int &den) const;
+  /**
+   * Computes the antipodal pair horizontal thickness.
+   * It is the vertex horizontal distance to the edge.
+   * @param num Numerator of the thickness rational value.
+   * @param den Denominator of the thickness rational value.
+   */
+  //void thickness (int &num, int &den) const;
 
   /** Returns the remainder of the edge line equation for given vertex. */
   int remainder (CHVertex *v) const;

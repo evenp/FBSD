@@ -77,13 +77,13 @@ Keyboard controls are :
 | e   | Sets main or opposite edge detection mode (main by default).
 | g/G | Tunes the sensitivity to the image contrast.
 | k/K | Tunes the fragments (connected components) minimal size
-| l/L | Tunes the minimal size of the detected blurred segments.
 | m   | Detects all the segments in the image
 | n   | Highlights the next detected segment in a multi-detection.
 | p   | Saves detection window in capture.png
 | q   | Displays all the registered blurred segments.
-| r/R | Tunes the sweeping resolution of automatic detections.
-| s/S | Tunes the tolerance to detection lacks.
+| r/R | Tunes the sweeping step of automatic detections.
+| s/S | Tunes the minimal size of the detected blurred segments.
+| t/T | Tunes the tolerance to detection lacks.
 | u   | Runs the last detection again.
 | x/X | Tunes the initial assigned width.
 | z/Z | Tunes the assigned width control delay.

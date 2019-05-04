@@ -166,6 +166,26 @@ void DigitalStraightSegment::getPoints (vector<Pt2i> &pts) const
 }
 
 
+void DigitalStraightSegment::naiveLine (AbsRat &x1, AbsRat &y1,
+                                        AbsRat &x2, AbsRat &y2) const
+{
+  if (a < (b < 0 ? -b : b))
+  {
+    x1.set (min, 1);
+    y1.set (2 * c + nu - 1 - 2 * a * min, 2 * b);
+    x2.set (max, 1);
+    y2.set (2 * c + nu - 1 - 2 * a * max, 2 * b);
+  }
+  else
+  {
+    y1.set (min, 1);
+    x1.set (2 * c + nu - 1 - 2 * b * min, 2 * a);
+    y2.set (max, 1);
+    x2.set (2 * c + nu - 1 - 2 * b * max, 2 * a);
+  }
+}
+
+
 DigitalStraightSegment *DigitalStraightSegment::erosion (int num, int den) const
 {
   int newwidth = nu;
@@ -199,4 +219,16 @@ void DigitalStraightSegment::dilate (int radius)
 {
   nu += 2 * radius;
   c -= radius;
+}
+
+
+bool DigitalStraightSegment::contains (Pt2i p, int tol) const
+{
+  int pos = a * p.x () + b * p.y ();
+  tol *= period ();
+  if (pos < c - tol || pos >= c + nu + tol) return (false);
+  if (a < (b < 0 ? -b : b))
+    return (p.x () >= min && p.x () <= max);
+  else
+    return (p.y () >= min && p.y () <= max);
 }

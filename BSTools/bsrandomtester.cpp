@@ -72,12 +72,12 @@ BSRandomTester::BSRandomTester ()
   detectors = new BSDetector[nbdets];
   for (int i = 0; i < nbdets; i++)
   {
-    detectors[i].setFineTracksMaxWidth (smaxwidth + swmargin);
+    detectors[i].setAssignedThickness (smaxwidth + swmargin);
     if (! detectors[i].isFinalLengthTestOn ())
       detectors[i].switchFinalLengthTest ();
   }
-  if (! detectors[0].oldDetectorOn ()) detectors[0].switchDetector ();
-  if (detectors[1].oldDetectorOn ()) detectors[1].switchDetector ();
+  detectors[0].setStaticDetector (true);
+  detectors[1].setStaticDetector (false);
   names = new QString[nbdets];
   names[0] = "old";
   names[1] = "new";
@@ -139,6 +139,8 @@ void BSRandomTester::randomTest ()
     if (gMap != NULL) delete gMap;
     gMap = new VMap (width, height, getBitmap (image), VMap::TYPE_SOBEL_5X5);
     gMap->incGradientThreshold (50 - gMap->getGradientThreshold ());
+    if (gMap->isOrientationConstraintOn ())
+      gMap->switchOrientationConstraint ();
     for (int det = 0; det < nbdets; det ++)
       detectors[det].setGradientMap (gMap);
 

@@ -71,9 +71,11 @@ public:
   void antipodalEdgeAndVertex (Pt2i &s, Pt2i &e, Pt2i &v) const;
 
   /**
-   * Returns the minimal vertical or horizontal thickness of the convex hull.
+   * Returns the convex hull thickness.
+   * The thickness is the minimal vertical or horizontal thickness.
+   * It is computed as the minimal value of both antipodal pairs.
    */
-  AbsRat rationalThickness () const;
+  AbsRat thickness () const;
 
   /**
    * Returns a string that represents the convex hull.

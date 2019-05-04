@@ -41,9 +41,22 @@ public:
   ~BlurredSegmentProto ();
 
   /**
-   * \brief Returns the minimal vertical or horizontal width.
+   * \brief Checks if the blurred segment has at least two points.
    */
-  AbsRat minimalWidth () const;
+  inline bool isLineable () const {
+    return (bsOK || bsFlat || leftOK || rightOK); }
+
+  /**
+   * \brief Returns the built-in blurred segment strict thickness.
+   * The strict thickness is the distance between bounding lines, ie (nu-1)/p.
+   */
+  AbsRat strictThickness () const;
+
+  /**
+   * \brief Returns the built-in blurred segment digital thickness.
+   * The digital thickness is the width of the digital straight line, ie nu/p.
+   */
+  AbsRat digitalThickness () const;
 
   /**
    * \brief Returns the requested max width of the segment.

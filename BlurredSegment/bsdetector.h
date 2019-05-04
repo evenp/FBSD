@@ -123,7 +123,8 @@ public:
               bool centralp = false, const Pt2i &pc = Pt2i ());
 
   /**
-   * \brief Detects a blurred segment between two input points.
+   * \brief Detects a blurred segment between two input points in static mode.
+   *    Static mode means no adaptive scans and no assigned thickness control.
    * Step 1: For each scan line, one candidate is selected
    *         based on the gradient norm only (no direction test).
    * Step 2: For each scan line, local candidates are detected
@@ -139,8 +140,8 @@ public:
    * @param centralp Set to true if the central point is provided.
    * @param pc Initial central point.
    */
-  int olddetect (const Pt2i &p1, const Pt2i &p2,
-                 bool centralp = false, const Pt2i &pc = Pt2i ());
+  int staticDetect (const Pt2i &p1, const Pt2i &p2,
+                    bool centralp = false, const Pt2i &pc = Pt2i ());
 
   /**
    * \brief Returns the detected blurred segment at given step.
@@ -165,15 +166,15 @@ public:
   inline void preserveFormerBlurredSegments () { mbsf.clear (); }
 
   /**
-   * \brief Returns the assigned maximal width for the fine tracks.
+   * \brief Returns the assigned maximal thickness to detector.
    */
-  inline int fineTracksMaxWidth () const { return fmaxWidth; }
+  inline int assignedThickness () const { return inThick; }
 
   /**
-   * \brief Sets the assigned maximal width for the fine tracks.
-   * @param val New width value.
+   * \brief Sets the assigned maximal thickness to detector.
+   * @param val New assigned thickness value.
    */
-  inline void setFineTracksMaxWidth (int val) { if (val > 0) fmaxWidth = val; }
+  inline void setAssignedThickness (int val) { if (val > 0) inThick = val; }
 
   /**
    * \brief Returns the assigned maximal width margin for the fast tracks.
@@ -225,15 +226,15 @@ public:
     return (gMap->incGradientResolution (inc)); }
 
   /**
-   * \brief Returns the automatic detection grid resolution.
+   * \brief Returns the stroke sweeping step value for automatic detections.
    */
-  inline int getAutoGridResolution () const { return autoResol; }
+  inline int getAutoSweepingStep () const { return autoSweepingStep; }
 
   /**
-   * \brief Sets the automatic detection grid resolution.
+   * \brief Sets the stroke sweeping step value for automatic detections.
    */
-  inline void setAutoGridResolution (int number) {
-    if (number > 0 && number < gMap->getWidth () / 8) autoResol = number; }
+  inline void setAutoSweepingStep (int number) {
+    if (number > 0 && number < gMap->getWidth () / 8) autoSweepingStep = number; }
 
   /**
    * \brief Returns the pixel lack tolerence.
@@ -414,33 +415,26 @@ public:
   /**
    * \brief Returns if the thickenning control is activated.
    */
-  inline bool isThickenningOn () const { return bst2->isThickenningOn (); }
+  inline bool isAssignedThicknessControlOn () const {
+    return bst2->isAssignedThicknessControlOn (); }
 
   /**
    * \brief Toggles the thickenning control.
    */
-  inline void toggleThickenning () { bst2->toggleThickenning (); }
+  inline void toggleAssignedThicknessControl () {
+    bst2->toggleAssignedThicknessControl (); }
 
   /**
-   * \brief Returns the thickenning limit.
+   * \brief Returns the assigned thickness control delay.
    */
-  inline int getThickenningLimit () const {
-    return bst2->getThickenningLimit (); }
+  inline int getAssignedThicknessControlDelay () const {
+    return bst2->getAssignedThicknessControlDelay (); }
 
   /**
-   * \brief Increments the thickenning limit.
+   * \brief Increments the assigned thickness control delay.
    */
-  inline void incThickenningLimit (int val) { bst2->incThickenningLimit (val); }
-
-  /**
-   * \brief Returns if the thinning is activated.
-   */
-  inline bool isThinningOn () const { return bst2->isThinningOn (); }
-
-  /**
-   * \brief Toggles the thinning strategy.
-   */
-  inline void toggleThinning () { bst2->toggleThinning (); }
+  inline void incAssignedThicknessControlDelay (int val) {
+    bst2->incAssignedThicknessControlDelay (val); }
 
   /**
    * \brief Returns if one of the filter is activated.
@@ -518,6 +512,29 @@ public:
     finalDensityTestOn = ! finalDensityTestOn; }
 
   /**
+   * \brief Returns whether the size test at final step is set.
+   */
+  inline bool isFinalSizeTestOn () const { return (finalSizeTestOn); }
+
+  /**
+   * \brief Switches on or off the final size test modality.
+   */
+  inline void switchFinalSizeTest () {
+    finalSizeTestOn = ! finalSizeTestOn; }
+
+  /**
+   * \brief Returns the minimal size of final blurred segments.
+   */
+  inline int finalSizeMinValue () const {
+    return (finalSizeTestOn ? finalSizeMinVal : 0); }
+
+  /**
+   * \brief Returns the minimal spread of final blurred segments.
+   */
+  inline void setFinalSizeMinValue (int val) {
+    finalSizeMinVal = (val < 0 ? 0 : val); }
+
+  /**
    * \brief Returns whether the length test at final step is set.
    */
   inline bool isFinalLengthTestOn () const { return (finalLengthTestOn); }
@@ -573,6 +590,12 @@ public:
   void incMaxDetections (bool dir);
 
   /**
+   * \brief Sets the maximum number of detections in a multi-detection.
+   * @param nb Number of detections (0 if illimited).
+   */
+  inline void setMaxDetections (int nb) { maxtrials = nb; }
+
+  /**
    * \brief Resets the maximum number of detections set for a multi-detection.
    */
   inline void resetMaxDetections () { maxtrials = 0; }
@@ -589,34 +612,40 @@ public:
                      Pt2i &p1, Pt2i &p2, int &swidth, Pt2i &pc) const;
 
   /**
-   * \brief Retuns whether the old detector (IWCIA '09) is used.
+   * \brief Retuns whether the static detector (IWCIA '09) is used.
    */
-  inline bool oldDetectorOn () { return oldp; }
+  inline bool staticDetectorOn () { return staticDetOn; }
 
   /**
-   * \brief Toggles the detector used (between IWCIA '09 and present).
+   * \brief Sets the static detector activation (IWCIA '09).
+   * @param status Activation status.
    */
-  inline void switchDetector () { oldp = ! oldp; }
+  inline void setStaticDetector (bool status) { staticDetOn = status; }
 
-std::string version ();
+  /**
+   * \brief Returns the version number.
+   */
+  std::string version ();
 
 
 private :
 
   /** Default value for the scan width for fast tracks. */
   static const int DEFAULT_FAST_TRACK_SCAN_WIDTH;
-  /** Default value for the max segment width for fine tracks. */
-  static const int DEFAULT_FINE_TRACK_MAX_WIDTH;
+  /** Default value for the assigned thickess to detection method. */
+  static const int DEFAULT_ASSIGNED_THICKNESS;
   /** Default value for the max segment width margin for fast tracks. */
   static const int DEFAULT_FAST_TRACK_MAX_MARGIN;
   /** Default value for the minimal size of the detected blurred segment. */
   static const int DEFAULT_BS_MIN_SIZE;
   /** Absolute value for the minimal size of the detected blurred segment. */
   static const int ABSOLUTE_BS_MIN_SIZE;
+  /** Default minimal size of the final blurred segment. */
+  static const int DEFAULT_FINAL_MIN_SIZE;
   /** Default value for the minimal size of connected components. */
   static const int DEFAULT_CONNECT_MIN_SIZE;
-  /** Default value for the automatic detection grid resolution. */
-  static const int DEFAULT_AUTO_RESOLUTION;
+  /** Default value of the stroke sweeping step for automatic detections. */
+  static const int DEFAULT_AUTO_SWEEPING_STEP;
   /** Default value for the preliminary stroke half length. */
   static const int PRELIM_MIN_HALF_WIDTH;
 
@@ -646,10 +675,10 @@ private :
   bool finalDensityTestOn;
   /** Length test modality after final detection. */
   bool finalLengthTestOn;
-  /** Spread test modality after final detection. */
-  bool finalSpreadTestOn;
-  /** Spread test min value. */
-  int finalSpreadMin;
+  /** Size test modality after final detection. */
+  bool finalSizeTestOn;
+  /** Size test minimal value. */
+  int finalSizeMinVal;
   /** Count of small BS eliminated by the spread test. */
   int nbSmallBS;
   /** Segment multi-selection modality status. */
@@ -660,15 +689,15 @@ private :
   int maxtrials;
   /** Automatic detection modality. */
   bool autodet;
-  /** Grid resolution for the automatic extraction. */
-  int autoResol;
+  /** Stroke sweeping step for the automatic extraction. */
+  int autoSweepingStep;
   /** Result of the blurred segment extraction. */
   int resultValue;
-  /** Old detector (IWCIA'09) modality. */
-  bool oldp;
+  /** Activation status of static detector (IWCIA'09). */
+  bool staticDetOn;
 
-  /** Assigned maximal width of the blurred segment for fine tracks. */
-  int fmaxWidth;
+  /** Assigned maximal thickness to the detector. */
+  int inThick;
   /** Assigned maximal width margin for fast tracks. */
   int imaxMargin;
 

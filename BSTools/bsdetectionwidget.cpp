@@ -17,6 +17,7 @@ const int BSDetectionWidget::BACK_GRADX = 4;
 const int BSDetectionWidget::BACK_GRADY = 5;
 
 const int BSDetectionWidget::DEFAULT_PEN_WIDTH = 1;
+const int BSDetectionWidget::SELECT_TOL = 5;
 
 
 
@@ -27,17 +28,12 @@ BSDetectionWidget::BSDetectionWidget (QWidget *parent)
   // Sets initial user inputs parameters
   setFocus ();
   grabKeyboard ();
+  picking = false;
   udef = false;
   nodrag = true;
 
   // Initializes the gradient map and the auxiliary views
   gMap = NULL;
-  // accuview = NULL;
-  // strucview = NULL;
-  // profileview = NULL;
-  // idetview = NULL;
-  // cannyview = NULL;
-  // yorkview = NULL;
 
   // Sets initial user outputs parameters
   verbose = false;
@@ -68,12 +64,6 @@ BSDetectionWidget::BSDetectionWidget (QWidget *parent)
 
 BSDetectionWidget::~BSDetectionWidget ()
 {
-  // if (accuview != NULL) delete accuview;
-  // if (strucview != NULL) delete strucview;
-  // if (profileview != NULL) delete profileview;
-  // if (idetview != NULL) delete idetview;
-  // if (cannyview != NULL) delete cannyview;
-  // if (yorkview != NULL) delete yorkview;
 }
 
 
@@ -92,11 +82,6 @@ QSize BSDetectionWidget::openImage (const QString &fileName, int type)
   buildGradientImage (0);
  
   update ();
-  /*
-  if (idetview != NULL) idetview->setImage (&loadedImage, gMap);
-  if (profileview != NULL) profileview->setImage (&loadedImage, gMap);
-  if (strucview != NULL) strucview->setGradientImage (&gradImage);
-  */
 
   xMaxShift = (width > maxWidth ? maxWidth - width : 0);
   yMaxShift = (height > maxHeight ? maxHeight - height : 0);
@@ -204,121 +189,6 @@ void BSDetectionWidget::paintEvent (QPaintEvent *)
 }
 
 
-/*
-void BSDetectionWidget::closeAccuAnalyzer ()
-{
-  if (accuview != NULL)
-  {
-    accuview->close ();
-    delete accuview;
-    accuview = NULL;
-  }
-}
-
-
-void BSDetectionWidget::closePixelAnalyzer ()
-{
-  if (strucview != NULL)
-  {
-    strucview->close ();
-    delete strucview;
-    strucview = NULL;
-  }
-}
-
-
-void BSDetectionWidget::closeProfileAnalyzer ()
-{
-  if (profileview != NULL)
-  {
-    profileview->close ();
-    delete profileview;
-    profileview = NULL;
-  }
-}
-
-
-void BSDetectionWidget::closeIdetAnalyzer ()
-{
-  if (idetview != NULL)
-  {
-    idetview->close ();
-    delete idetview;
-    idetview = NULL;
-  }
-}
-
-
-void BSDetectionWidget::switchAccuAnalyzer ()
-{
-  if (accuview != NULL)
-  {
-    accuview->close ();
-    delete accuview;
-    accuview = NULL;
-  }
-  else
-  {
-    accuview = new BSAccumulatorView (&detector);
-    accuview->show ();
-  }
-}
-
-
-void BSDetectionWidget::switchPixelAnalyzer ()
-{
-  if (strucview != NULL)
-  {
-    strucview->close ();
-    delete strucview;
-    strucview = NULL;
-  }
-  else
-  {
-    strucview = new BSStructureView (&loadedImage, &detector);
-    strucview->setGradientImage (&gradImage);
-    strucview->show ();
-  }
-}
-
-
-void BSDetectionWidget::switchProfileAnalyzer ()
-{
-  if (profileview != NULL)
-  {
-    profileview->close ();
-    delete profileview;
-    profileview = NULL;
-  }
-  else
-  {
-    profileview = new BSProfileView ();
-    profileview->setImage (&loadedImage, gMap);
-    if (! p1.equals (p2)) profileview->buildScans (p1, p2);
-    profileview->show ();
-  }
-}
-
-
-void BSDetectionWidget::switchIdetAnalyzer ()
-{
-  if (idetview != NULL)
-  {
-    idetview->close ();
-    delete idetview;
-    idetview = NULL;
-  }
-  else
-  {
-    idetview = new BSIdetView (&detector);
-    idetview->setImage (&loadedImage, gMap);
-    idetview->update ();
-    idetview->show ();
-  }
-}
-*/
-
-
 void BSDetectionWidget::switchHighlightColors ()
 {
   darkHighlightOn = ! darkHighlightOn;
@@ -343,12 +213,13 @@ void BSDetectionWidget::switchArlequin ()
 
 void BSDetectionWidget::mousePressEvent (QMouseEvent *event)
 {
+  int ex = zoom * (event->pos().x () - xShift);
+  int ey = height - 1 - zoom * (event->pos().y () - yShift);
+
   oldp1.set (p1);
   oldp2.set (p2);
   oldudef = udef;
-  int ex = zoom * (event->pos().x () - xShift);
-  int ey = zoom * (event->pos().y () - yShift);
-  p1 = Pt2i (ex, height - 1 - ey);
+  p1 = Pt2i (ex, ey);
   if (p1.manhattan (p2) < 10) p1.set (oldp1);
   else if (p1.manhattan (oldp1) < 10) p1.set (p2);
   udef = true;
@@ -357,40 +228,47 @@ void BSDetectionWidget::mousePressEvent (QMouseEvent *event)
 
 void BSDetectionWidget::mouseReleaseEvent (QMouseEvent *event)
 {
-  int ex = zoom * (event->pos().x () - xShift);
-  int ey = zoom * (event->pos().y () - yShift);
-  p2 = Pt2i (ex, height - 1 - ey);
-  if (p1.equals (p2))
+  if (! picking)
   {
-    p1.set (oldp1);
-    p2.set (oldp2);
-    udef = oldudef;
-  }
-  else
-  {
-    cerr << "p1 defined: " << p1.x () << " " << p1.y () << endl;
-    cerr << "p2 defined: " << p2.x () << " " << p2.y () << endl;
-    detector.resetMaxDetections ();
-    extract ();
+    int ex = zoom * (event->pos().x () - xShift);
+    int ey = zoom * (event->pos().y () - yShift);
+    p2 = Pt2i (ex, height - 1 - ey);
+    if (p1.equals (p2))
+    {
+      p1.set (oldp1);
+      p2.set (oldp2);
+      udef = oldudef;
+    }
+    else
+    {
+      cerr << "p1 defined: " << p1.x () << " " << p1.y () << endl;
+      cerr << "p2 defined: " << p2.x () << " " << p2.y () << endl;
+      detector.resetMaxDetections ();
+      extract ();
+    }
   }
 }
 
 
 void BSDetectionWidget::mouseMoveEvent (QMouseEvent *event)
 {
-  int ex = zoom * (event->pos().x () - xShift);
-  int ey = zoom * (event->pos().y () - yShift);
-  p2 = Pt2i (ex, height - 1 - ey);
-  if (verbose) cerr << "(" << p1.x () << ", " << p1.y () << ") ("
-                    << p2.x () << ", " << p2.y () << ")" << endl;
-  if (p1.manhattan (p2) > 5
-      && (width > p2.x() && height > p2.y()
-          && p2.x() > 0 && p2.y() > 0))
+  if (picking) picking = false;
+  else
   {
-    nodrag = false;
-    extract ();
-    nodrag = true;
-    detector.setMaxTrials (0);
+    int ex = zoom * (event->pos().x () - xShift);
+    int ey = zoom * (event->pos().y () - yShift);
+    p2 = Pt2i (ex, height - 1 - ey);
+    if (verbose) cerr << "(" << p1.x () << ", " << p1.y () << ") ("
+                      << p2.x () << ", " << p2.y () << ")" << endl;
+    if (p1.manhattan (p2) > 5
+        && (width > p2.x() && height > p2.y()
+            && p2.x() > 0 && p2.y() > 0))
+    {
+      nodrag = false;
+      extract ();
+      nodrag = true;
+      detector.setMaxTrials (0);
+    }
   }
 }
 
@@ -671,15 +549,35 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       }
       else
       {
-        // Tunes the automatic detection grid resolution
-        detector.setAutoGridResolution (detector.getAutoGridResolution () +
+        // Tunes the sweeping step value for automatic detections
+        detector.setAutoSweepingStep (detector.getAutoSweepingStep () +
           (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Automatic detection grid resolution = "
-             << detector.getAutoGridResolution () << " pixels" << endl;
+        cout << "Stroke sweeping step for automatic detections = "
+             << detector.getAutoSweepingStep () << " pixels" << endl;
       }
       break;
 
     case Qt::Key_S :
+      if (event->modifiers () & Qt::ControlModifier)
+      {
+        // Switches the final size test of detected blurred segments
+        detector.switchFinalSizeTest ();
+        cout << "Final size test "
+             << (detector.isFinalSizeTestOn () ? "on" : "off") << endl;
+        extract ();
+      }
+      else
+      {
+        // Tunes the detector assigned thickness
+        detector.setAssignedThickness (detector.finalSizeMinValue () +
+          (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
+        cout << "Minimal size of detected blurred segments = "
+             << detector.finalSizeMinValue () << " points" << endl;
+        extract ();
+      }
+      break;
+
+    case Qt::Key_T :
       if (event->modifiers () & Qt::ControlModifier)
       {
         // Switches the interruption handling
@@ -695,19 +593,6 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
           (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
         cout << "Tolerence to detection lacks = "
              << detector.getPixelLackTolerence () << " pixels" << endl;
-        extract ();
-      }
-      break;
-
-    case Qt::Key_T :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches the progressive thinning
-        detector.toggleThinning ();
-        if (detector.isThinningOn () && detector.isThickenningOn ())
-          detector.toggleThickenning ();
-        cout << "Thinning "
-             << (detector.isThinningOn () ? "on" : "off") << endl;
         extract ();
       }
       break;
@@ -767,11 +652,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       }
       else
       {
-        // Tunes the assigned max width for fast tracks
-        detector.setFineTracksMaxWidth (detector.fineTracksMaxWidth () +
+        // Tunes the assigned thickness to detector
+        detector.setAssignedThickness (detector.assignedThickness () +
           (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Initial assigned width = "
-             << detector.fineTracksMaxWidth () << endl;
+        cout << "Assigned thickness = "
+             << detector.assignedThickness () << endl;
         extract ();
       }
       break;
@@ -797,20 +682,20 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
     case Qt::Key_Z :
       if (event->modifiers () & Qt::ControlModifier)
       {
-        // Switches the thickenning control
-        detector.toggleThickenning ();
-        if (detector.isThickenningOn () && detector.isThinningOn ())
-          detector.toggleThinning ();
-        cout << "Assigned width control "
-             << (detector.isThickenningOn () ? "on" : "off") << endl;
+        // Switches the assigned thickness control
+        detector.toggleAssignedThicknessControl ();
+        cout << "Assigned thickness control "
+             << (detector.isAssignedThicknessControlOn () ? "on" : "off")
+             << endl;
         extract ();
       }
       else
       {
-        // Tunes the thickenning limit
-        detector.incThickenningLimit (
+        // Tunes the assigned thickness control delay
+        detector.incAssignedThicknessControlDelay (
           (event->modifiers () & Qt::ShiftModifier) ? -1 : 1);
-        cout << "Thickenning limit = " << detector.getThickenningLimit ()
+        cout << "Assigned thickness control delay = "
+             << detector.getAssignedThicknessControlDelay ()
              << " pixels" << endl;
         extract ();
       }
@@ -898,22 +783,6 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       displayDetectionResult ();
       break;
 
-    case Qt::Key_1 :
-      // switchPixelAnalyzer ();
-      break;
-
-    case Qt::Key_2 :
-      // switchAccuAnalyzer ();
-      break;
-
-    case Qt::Key_3 :
-      // switchProfileAnalyzer ();
-      break;
-
-    case Qt::Key_4 :
-      // switchIdetAnalyzer ();
-      break;
-
     case Qt::Key_5 :
       // Switches the crosswise segment detection
       detector.switchTrackCrosswise ();
@@ -923,9 +792,9 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_6 :
-      detector.switchDetector ();
-      cout << (detector.oldDetectorOn () ?
-               "Old detector set" : "New detector set") << endl;
+      detector.setStaticDetector (! (detector.staticDetectorOn ()));
+      cout << (detector.staticDetectorOn () ?
+               "Static detector set" : "Static detector released") << endl;
       extract ();
       break;
 
@@ -945,32 +814,6 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       localTest ();
       break;
   }
-  /*
-  else if (strucview != NULL && strucview->isActiveWindow ())
-  {
-    if (strucview->processKeyEvent (event)) extract ();
-  }
-  else if (accuview != NULL && accuview->isActiveWindow ())
-  {
-    if (accuview->processKeyEvent (event)) extract ();
-  }
-  else if (profileview != NULL && profileview->isActiveWindow ())
-  {
-    if (profileview->processKeyEvent (event)) extract ();
-  }
-  else if (idetview != NULL && idetview->isActiveWindow ())
-  {
-    if (idetview->processKeyEvent (event)) extract ();
-  }
-  else if (yorkview != NULL && yorkview->isActiveWindow ())
-  {
-    if (yorkview->processKeyEvent (event)) extract ();
-  }
-  else if (cannyview != NULL && cannyview->isActiveWindow ())
-  {
-    if (cannyview->processKeyEvent (event)) extract ();
-  }
-  */
 }
 
 
@@ -1126,21 +969,46 @@ void BSDetectionWidget::writeTest ()
 
 void BSDetectionWidget::writeDetectionResult ()
 {
-  BlurredSegment *bs = detector.getBlurredSegment ();
-  if (bs != NULL)
+  vector<BlurredSegment *> bss = detector.getBlurredSegments ();
+  if (bss.empty ())
   {
-    ofstream outf ("seg.txt", ios::out);
-    outf << "(" << bs->antipodalEdgeStart().x ()
-         << ", " << bs->antipodalEdgeStart().y ()
-         << ") (" << bs->antipodalEdgeEnd().x ()
-         << ", " << bs->antipodalEdgeEnd().y ()
-         << ") (" << bs->antipodalVertex().x ()
-         << ", " << bs->antipodalVertex().y ()
-         << ") (" << bs->getLastLeft().x ()
-         << ", " << bs->getLastLeft().y ()
-         << ") (" << bs->getLastRight().x ()
-         << ", " << bs->getLastRight().y ()
-         << ")" << endl;
+    BlurredSegment *bs = detector.getBlurredSegment ();
+    if (bs != NULL)
+    {
+      ofstream outf ("seg.txt", ios::out);
+      outf << "(" << bs->antipodalEdgeStart().x ()
+           << ", " << bs->antipodalEdgeStart().y ()
+           << ") (" << bs->antipodalEdgeEnd().x ()
+           << ", " << bs->antipodalEdgeEnd().y ()
+           << ") (" << bs->antipodalVertex().x ()
+           << ", " << bs->antipodalVertex().y ()
+           << ") (" << bs->getLastLeft().x ()
+           << ", " << bs->getLastLeft().y ()
+           << ") (" << bs->getLastRight().x ()
+           << ", " << bs->getLastRight().y ()
+           << ")" << endl;
+      outf.close ();
+    }
+  }
+  else
+  {
+    ofstream outf ("segs.txt", ios::out);
+    vector<BlurredSegment *>::iterator it = bss.begin ();
+    while (it != bss.end ())
+    {
+      outf << "(" << (*it)->antipodalEdgeStart().x ()
+           << ", " << (*it)->antipodalEdgeStart().y ()
+           << ") (" << (*it)->antipodalEdgeEnd().x ()
+           << ", " << (*it)->antipodalEdgeEnd().y ()
+           << ") (" << (*it)->antipodalVertex().x ()
+           << ", " << (*it)->antipodalVertex().y ()
+           << ") (" << (*it)->getLastLeft().x ()
+           << ", " << (*it)->getLastLeft().y ()
+           << ") (" << (*it)->getLastRight().x ()
+           << ", " << (*it)->getLastRight().y ()
+           << ")" << endl;
+      it++;
+    }
     outf.close ();
   }
 }
@@ -1189,20 +1057,6 @@ void BSDetectionWidget::displayDetectionResult ()
   // Update auxiliary view if not dragging
   if (nodrag)
   {
-    /*
-    if (idetview != NULL) idetview->update ();
-    if (profileview != NULL)
-    {
-      profileview->buildScans (p1, p2);
-      profileview->scene()->update ();
-    }
-    if (accuview != NULL) accuview->scene()->update ();
-    if (strucview != NULL)
-    {
-      strucview->scene()->update ();
-      strucview->repaint ();
-    }
-    */
     if (verbose) writeDetectionStatus ();
     if (statsOn) writeStats ();
   }
@@ -1428,9 +1282,8 @@ void BSDetectionWidget::alternateTest ()
   outf << width << endl;
   outf << height << endl;
 
-  if (detector.oldDetectorOn ()) detector.switchDetector ();
-  cout << "Performance test on "
-       << (detector.oldDetectorOn () ? "old" : "new") << " detector" << endl;
+  detector.setStaticDetector (false);
+  cout << "Performance test on new detector" << endl;
   clock_t start = clock ();
   for (int i = 0; i < nbruns; i++) detector.detectAll ();
   diff1 = (clock () - start) / (double) CLOCKS_PER_SEC;
@@ -1477,9 +1330,8 @@ void BSDetectionWidget::alternateTest ()
   lcount = 0;
   wtotal = 0.;
   lwtotal = 0.;
-  detector.switchDetector ();
-  cout << "Performance test on "
-       << (detector.oldDetectorOn () ? "old" : "new") << " detector" << endl;
+  detector.setStaticDetector (true);
+  cout << "Performance test on old detector" << endl;
   start = clock ();
   for (int i = 0; i < nbruns; i++) detector.detectAll ();
   diff1 = (clock () - start) / (double) CLOCKS_PER_SEC;

@@ -3,42 +3,42 @@
 
 AbsRat::AbsRat ()
 {
-  num = 1;
-  den = 0;
+  numer = 1;
+  denom = 0;
 }
 
 
 AbsRat::AbsRat (int numerator, int denominator)
 {
-  num = (numerator < 0 ? - numerator : numerator);
-  den = (denominator < 0 ? - denominator : denominator);
+  numer = (numerator < 0 ? - numerator : numerator);
+  denom = (denominator < 0 ? - denominator : denominator);
 }
 
 
 AbsRat::AbsRat (const AbsRat &rat)
 {
-  num = rat.num;
-  den = rat.den;
+  numer = rat.numer;
+  denom = rat.denom;
 }
 
 
 void AbsRat::attractsTo (const AbsRat &val, const AbsRat &ratio)
 {
-  if (val.den != 0)
-    num = (ratio.den * num * val.den
-           - (num * val.den - den * val.num) * ratio.num)
-          / (ratio.den * val.den);
+  if (val.denom != 0)
+    numer = (ratio.denom * numer * val.denom
+           - (numer * val.denom - denom * val.numer) * ratio.numer)
+          / (ratio.denom * val.denom);
 }
 
 
 void AbsRat::sticksTo (const AbsRat &val)
 {
-  if (val.den != 0) num = (den * val.num) / val.den;
+  if (val.denom != 0) numer = (denom * val.numer) / val.denom;
 }
 
 
 void AbsRat::mult (const AbsRat &val)
 {
-  num *= val.num;
-  den *= val.den;
+  numer *= val.numer;
+  denom *= val.denom;
 }

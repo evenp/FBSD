@@ -241,6 +241,11 @@ public:
     orientedGradient = ! orientedGradient; }
 
   /**
+   * \brief Switches the direction constraint for local maxima selection.
+   */
+  inline bool isOrientationConstraintOn () const { return orientedGradient; }
+
+  /**
    * \brief Returns the occupancy mask contents.
    */
   inline bool *getMask () const { return (mask); }

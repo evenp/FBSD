@@ -56,10 +56,22 @@ BlurredSegmentProto::~BlurredSegmentProto ()
 }
 
 
-AbsRat BlurredSegmentProto::minimalWidth () const
+AbsRat BlurredSegmentProto::strictThickness () const
 {
-  return (convexhull != NULL ? convexhull->rationalThickness ()
-                             : AbsRat (0, 1));
+  return (convexhull != NULL ? convexhull->thickness () : AbsRat (0, 1));
+}
+
+
+AbsRat BlurredSegmentProto::digitalThickness () const
+{
+  if (bsOK)
+  {
+    Pt2i s, e, v;
+    convexhull->antipodalEdgeAndVertex (s, e, v);
+    DigitalStraightLine l (s, e, v);
+    return (AbsRat (l.width (), l.period ()));
+  }
+  return (AbsRat (1, 1));
 }
 
 
@@ -71,9 +83,10 @@ DigitalStraightLine *BlurredSegmentProto::getLine () const
     convexhull->antipodalEdgeAndVertex (s, e, v);
     return (new DigitalStraightLine (s, e, v));
   }
-  if (bsFlat) return (new DigitalStraightLine (getLastLeft (), getLastRight (),
-                                               DigitalStraightLine::DSL_THIN));
-  return (NULL);
+  if (bsFlat || leftOK || rightOK)
+    return (new DigitalStraightLine (getLastLeft (), getLastRight (),
+                                     DigitalStraightLine::DSL_THIN));
+  return (NULL); // No line if only one point
 }
 
 
@@ -200,7 +213,7 @@ bool BlurredSegmentProto::addRight (Pt2i pix)
 bool BlurredSegmentProto::addPoint (Pt2i p, bool onleft)
 {
   bool inserted = convexhull->addPointDS (p, onleft);
-  if ((minimalWidth ()).greaterThan (maxWidth))
+  if ((strictThickness ()).greaterThan (maxWidth))
   {
     if (inserted) convexhull->restore ();
     return false;

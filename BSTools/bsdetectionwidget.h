@@ -8,10 +8,6 @@
 #include <QVector>
 #include <fstream>
 #include "bsdetector.h"
-// #include "bsaccumulatorview.h"
-// #include "bsstructureview.h"
-// #include "bsprofileview.h"
-// #include "bsidetview.h"
 
 using namespace std;
 
@@ -76,46 +72,6 @@ public:
    * @param dir : Gradient type (magnitude, x or y)
    */
   void buildGradientImage (int dir);
-
-  /**
-   * \brief Requires the accumulation window closure.
-   */
-  // void closeAccuAnalyzer ();
-
-  /**
-   * \brief Requires the pixel analysis window closure.
-   */
-  void closePixelAnalyzer ();
-
-  /**
-   * \brief Requires the profile analysis window closure.
-   */
-  void closeProfileAnalyzer ();
-
-  /**
-   * \brief Requires the initial detection analysis window closure.
-   */
-  void closeIdetAnalyzer ();
-
-  /**
-   * \brief Switches the pixel display window on or off.
-   */
-  void switchPixelAnalyzer ();
-
-  /**
-   * \brief Switches the accumulator display window on or off.
-   */
-  // void switchAccuAnalyzer ();
-
-  /**
-   * \brief Switches the profile display window on or off.
-   */
-  void switchProfileAnalyzer ();
-
-  /**
-   * \brief Switches the initial detection display window on or off.
-   */
-  void switchIdetAnalyzer ();
 
   /**
    * \brief Return whether the blurred segment highlight colors are set.
@@ -219,6 +175,8 @@ private:
 
   /** Default value for pen width. */
   static const int DEFAULT_PEN_WIDTH;
+  /** Tolerence for segment picking (in count of naive lines) */
+  static const int SELECT_TOL;
 
 
   /** Initial scan start point. */
@@ -231,6 +189,8 @@ private:
   Pt2i oldp2;
   /** Flag indicating if the mouse is not dragging. */
   bool nodrag;
+  /** Flag indicating if picking mode is set. */
+  bool picking;
   /** Flag indicating if the detection is user defined. */
   bool udef;
   /** Saved user definition flag. */
@@ -294,14 +254,6 @@ private:
 
   /** Blurred segment detector. */
   BSDetector detector;
-  /** Initial detection graphics view. */
-  // BSIdetView *idetview;
-  /** Scanned profile graphics view. */
-  // BSProfileView *profileview;
-  /** Filter accumulator view. */
-  // BSAccumulatorView *accuview;
-  /** Blurred segment contents view. */
-  // BSStructureView *strucview;
 
   /** Aggregation of segment extraction results with initial conditions. */
   struct ExtractedSegment
