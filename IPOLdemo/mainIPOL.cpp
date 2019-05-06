@@ -134,14 +134,30 @@ int main (int argc, char *argv[])
         nbseg ++;
       }
     }
+
+/*
+AbsRat x1, y1, x2, y2;
+vector<BlurredSegment *> bss = detector.getBlurredSegments ();
+vector<BlurredSegment *>::const_iterator it = bss.begin ();
+while (it != bss.end ())
+{
+  DigitalStraightSegment *dss = (*it)->getSegment ();
+  dss->naiveLine (x1, y1, x2, y2);
+*/
+
   vector<BlurredSegment *>::const_iterator it = bss.begin ();
     while (it != bss.end ())
     {
       // Affichage du premier point
       vector<Pt2i> points = (*it)->getAllPoints ();
       
-      fout <<  points.front().x() << " " << points.front().y() << " "
-                <<  points.back().x() << " " << points.back().y() << std::endl;
+      AbsRat x1, y1, x2, y2;
+      DigitalStraightSegment *dss = (*it)->getSegment ();
+      dss->naiveLine (x1, y1, x2, y2);
+      fout << (x1.num () / (double) x1.den ()) << " "
+           << (y1.num () / (double) y1.den ()) << " "
+           << (x2.num () / (double) x2.den ()) << " "
+           << (y2.num () / (double) y2.den ()) << std::endl;
       // Export pour l'affichage de tous les points d'un segments
       for(auto &p : points)
       {
@@ -187,9 +203,14 @@ int main (int argc, char *argv[])
     {
       // Affichage du premier point
       vector<Pt2i> points = (*it)->getAllPoints ();
-      
-      fout <<  points.front().x() << " " << points.front().y() << " "
-                <<  points.back().x() << " " << points.back().y() << std::endl;
+
+      AbsRat x1, y1, x2, y2;
+      DigitalStraightSegment *dss = (*it)->getSegment ();
+      dss->naiveLine (x1, y1, x2, y2);
+      fout << (x1.num () / (double) x1.den ()) << " "
+           << (y1.num () / (double) y1.den ()) << " "
+           << (x2.num () / (double) x2.den ()) << " "
+           << (y2.num () / (double) y2.den ()) << std::endl;
 
       // Export pour l'affichage de tous les points d'un segments
       for(auto &p : points)

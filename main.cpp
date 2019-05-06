@@ -56,7 +56,7 @@ int main (int argc, char *argv[])
     int height = im.height ();
     int **tabImage = new int*[height];
     for (int i = 0; i < height; i++)
-    {
+    { 
       tabImage[i] = new int[width];
       for(int j = 0; j < width; j++)
       {

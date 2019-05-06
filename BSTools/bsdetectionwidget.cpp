@@ -216,13 +216,48 @@ void BSDetectionWidget::mousePressEvent (QMouseEvent *event)
   int ex = zoom * (event->pos().x () - xShift);
   int ey = height - 1 - zoom * (event->pos().y () - yShift);
 
-  oldp1.set (p1);
-  oldp2.set (p2);
-  oldudef = udef;
-  p1 = Pt2i (ex, ey);
-  if (p1.manhattan (p2) < 10) p1.set (oldp1);
-  else if (p1.manhattan (oldp1) < 10) p1.set (p2);
-  udef = true;
+  if (event->button () == Qt::RightButton)
+  {
+    vector<BlurredSegment *> bsl = detector.getBlurredSegments ();
+    if (! bsl.empty ())
+    {
+      bool searching = true;
+      int nb = 0;
+      vector<BlurredSegment *>::iterator it = bsl.begin ();
+      while (searching && it != bsl.end ())
+      {
+        if (*it != NULL)
+        {
+          DigitalStraightSegment *dss = (*it)->getSegment ();
+          if (dss != NULL)
+          {
+            if (dss->contains (Pt2i (ex, ey), SELECT_TOL))
+            {
+              searching = false;
+            }
+            else nb ++;
+          }
+          else nb ++;
+        }
+        else nb ++;
+        it ++;
+      }
+      cout << "Selection of segment " << (searching ? 0 : nb + 1) << endl;
+      detector.setMaxDetections (searching ? 0 : nb + 1);
+      extract ();
+    }
+    picking = true;
+  }
+  else
+  {
+    oldp1.set (p1);
+    oldp2.set (p2);
+    oldudef = udef;
+    p1 = Pt2i (ex, ey);
+    if (p1.manhattan (p2) < 10) p1.set (oldp1);
+    else if (p1.manhattan (oldp1) < 10) p1.set (p2);
+    udef = true;
+  }
 }
 
 
@@ -310,35 +345,31 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       clearSavedSegments ();
       break;
 
-    case Qt::Key_D :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches density test at initial step
-        detector.switchDensityTest ();
-        cout << "Density test : "
-             << (detector.isDensityTestOn () ? "on" : "off") << endl;
-        extract ();
-      }
-      break;
-
     case Qt::Key_E :
-      // Handles directed edge or stroke detection
-      if (event->modifiers () & Qt::ControlModifier)
-        detector.switchEdgeDirectionConstraint ();
-      else detector.invertEdgeDirection ();
-      switch (detector.edgeDirectionConstraint ())
       {
-        case 0 :
-          cout << "Line detection mode set" << endl;
-          break;
-        case 1 :
-          cout << "Main edge detection mode set" << endl;
-          break;
-        case -1 :
-          cout << "Opposite edge detection mode set" << endl;
-          break;
+        // Handles single or double edge detection
+        if (event->modifiers () & Qt::ControlModifier)
+        {
+          detector.switchSingleOrDoubleEdge ();
+          if (detector.isSingleEdgeModeOn ())
+            cout << "Single edge detection set ("
+                 << (detector.isOppositeGradientOn () ?
+                     "opposite" : "main") << ")" << endl;
+          else cout << "Double edge detection set" << endl;
+          extract ();
+        }
+        // Handles gradient orientation direction for the detection
+        else
+        {
+          if (detector.switchOppositeGradient ())
+          {
+            cout << "Single edge detection set ("
+                 << (detector.isOppositeGradientOn () ?
+                     "opposite" : "main") << ")" << endl;
+            extract ();
+          }
+        }
       }
-      extract ();
       break;
 
     case Qt::Key_F :
@@ -354,22 +385,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_G :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches length test at final step
-        detector.switchFinalLengthTest ();
-        cout << "Final length test : "
-             << (detector.isFinalLengthTestOn () ? "on" : "off") << endl;
-        extract ();
-      }
-      else
-      {
-        // Tunes the gradient threshold for maximal value detection
-        detector.incSensitivity (
-          (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Sensitivity = " << detector.getSensitivity () << endl;
-        extract ();
-      }
+      // Tunes the gradient threshold for maximal value detection
+      detector.incSensitivity (
+        (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
+      cout << "Sensitivity = " << detector.getSensitivity () << endl;
+      extract ();
       break;
 
     case Qt::Key_H :
@@ -384,44 +404,23 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       }
       break;
 
-    case Qt::Key_J :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches the proximity constraint for fast tracks
-        detector.switchFastTrackProximityConstraint ();
-        cout << "Proximity constraint on fast tracks "
-             << (detector.fastTrackProximityConstraintOn () ? "on" : "off")
-             << endl;
-        extract ();
-      }
-      else if (detector.fastTrackProximityConstraintOn ())
-      {
-        // Tunes the proximity threshold for fast tracks
-        detector.incFastTrackProximityThreshold (
-                    (event->modifiers () & Qt::ShiftModifier) == 0);
-        cout << "Proximity threshold for fast tracks = "
-             << detector.getFastTrackProximityThreshold () << endl;
-        extract ();
-      }
-      break;
-
     case Qt::Key_K :
       if (event->modifiers () & Qt::ControlModifier)
       {
-        // Switches the final step connectivity constraint
-        detector.switchConnectivityConstraint ();
-        cout << "Fragmentation test "
-             << (detector.isConnectivityConstraintOn () ? "on" : "off")
+        // Switches the final fragmentation test
+        detector.switchFinalFragmentationTest ();
+        cout << "Final fragmentation test "
+             << (detector.isFinalFragmentationTestOn () ? "on" : "off")
              << endl;
         extract ();
       }
       else
       {
-        // Tunes the minimal size of connected components
-        detector.incConnectedComponentMinSize (
+        // Tunes the minimal size of segment fragments
+        detector.incFragmentSizeMinValue (
                     (event->modifiers () & Qt::ShiftModifier) == 0);
         cout << "Fragments minimal size = "
-             << detector.getConnectedComponentMinSize () << endl;
+             << detector.fragmentSizeMinValue () << endl;
         extract ();
       }
       break;
@@ -429,19 +428,19 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
     case Qt::Key_L :
       if (event->modifiers () & Qt::ControlModifier)
       {
-        // Switches density test at final step
-        detector.switchFinalDensityTest ();
-        cout << "Final density test : "
-             << (detector.isFinalDensityTestOn () ? "on" : "off") << endl;
+        // Switches sparsity test at final step
+        detector.switchFinalSparsityTest ();
+        cout << "Final sparsity test : "
+             << (detector.isFinalSparsityTestOn () ? "on" : "off") << endl;
         extract ();
       }
       else
       {
-        // Tunes the output blurred segment minimal size
-        detector.setBSminSize (detector.getBSminSize () +
+        // Tunes the initial segment minimal size
+        detector.setInitialMinSize (detector.initialSizeMinValue () +
           (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Detected blurred segments min size = "
-             << detector.getBSminSize () << endl;
+        cout << "Initial segment min size = "
+             << detector.initialSizeMinValue () << endl;
         extract ();
       }
       break;
@@ -488,37 +487,15 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_O :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches the scan directionality
-        detector.switchOrthoScans ();
-        cout << (detector.orthoScansOn () ?
-                 "Orthographic scans" : "Directional scans") << endl;
-        extract ();
-      }
-      else
-      {
         // Outputs the detected segment
         cout << "Outputs detection result" << endl;
         writeDetectionResult ();
-      }
       break;
 
     case Qt::Key_P :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switchues the preliminary detection
-        detector.switchPreliminary ();
-        cout << "Initial detection duplication "
-             << (detector.isPreliminary () ? "on" : "off") << endl;
-        extract ();
-      }
-      else
-      {
         // Captures main window
         cout << "Saves main window in capture.png" << endl;
         augmentedImage.save ("capture.png");
-      }
       break;
 
     case Qt::Key_Q :
@@ -539,22 +516,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_R :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Toggles the occupancy mask dilation type
-        gMap->toggleMaskDilation ();
-        cout << "Occupancy mask dilation size : "
-             << gMap->getMaskDilation () << endl;
-        extract ();
-      }
-      else
-      {
         // Tunes the sweeping step value for automatic detections
         detector.setAutoSweepingStep (detector.getAutoSweepingStep () +
           (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
         cout << "Stroke sweeping step for automatic detections = "
              << detector.getAutoSweepingStep () << " pixels" << endl;
-      }
       break;
 
     case Qt::Key_S :
@@ -568,8 +534,8 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       }
       else
       {
-        // Tunes the detector assigned thickness
-        detector.setAssignedThickness (detector.finalSizeMinValue () +
+        // Tunes the final size threshold
+        detector.setFinalSizeMinValue (detector.finalSizeMinValue () +
           (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
         cout << "Minimal size of detected blurred segments = "
              << detector.finalSizeMinValue () << " points" << endl;
@@ -621,33 +587,13 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
         switchVerbose ();
       break;
 
-    case Qt::Key_W :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches the scan centering on the detected segment
-        detector.switchScanRecentering ();
-        cout << "Fine tracking centered on " << (detector.isScanRecentering () ?
-                "detected segment" : "initial scan") << endl;
-        extract ();
-      }
-      else
-      {
-        // Tunes the assigned max width margin for fine tracks
-        detector.setFastTracksMaxMargin (detector.fastTracksMaxMargin () +
-          (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Fast tracks max width margin = "
-             << detector.fastTracksMaxMargin () << endl;
-        extract ();
-      }
-      break;
-
     case Qt::Key_X :
       if (event->modifiers () & Qt::ControlModifier)
       {
-        // Switches the setting of the assigned width on the detected segment
-        detector.switchScanFitting ();
-        cout << "Fine tracking fitted to " << (detector.isScanFitting () ?
-                "detected segment width" : "assigned width") << endl;
+        detector.setStaticDetector (! (detector.staticDetectorOn ()));
+        cout << (detector.staticDetectorOn () ?
+                 "Static (without ADS and ATC) detector set" :
+                 "Static (without ADS and ATC) detector released") << endl;
         extract ();
       }
       else
@@ -783,31 +729,8 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       displayDetectionResult ();
       break;
 
-    case Qt::Key_5 :
-      // Switches the crosswise segment detection
-      detector.switchTrackCrosswise ();
-      extract ();
-      cout << "Crosswise segment detection "
-           << (detector.trackCrosswiseOn () ? "on" : "off") << endl;
-      break;
-
-    case Qt::Key_6 :
-      detector.setStaticDetector (! (detector.staticDetectorOn ()));
-      cout << (detector.staticDetectorOn () ?
-               "Static detector set" : "Static detector released") << endl;
-      extract ();
-      break;
-
     case Qt::Key_7 :
       storeUserInput ();
-      break;
-
-    case Qt::Key_8 :
-      alternateTest ();
-      break;
-
-    case Qt::Key_9 :
-      performanceTest ();
       break;
 
     case Qt::Key_0 :
@@ -1217,12 +1140,15 @@ void BSDetectionWidget::writeDetectionStatus ()
   else if (res == BSDetector::RESULT_FINAL_NO_DETECTION)
     cout << "Extraction : no final detection (bsini == NULL)." << endl;
   else if (res == BSDetector::RESULT_FINAL_TOO_FEW)
-    cout << "Extraction : two few points at final detection." << endl;
+    cout << "Extraction : unsuccessful size test at final detection." << endl;
   else if (res == BSDetector::RESULT_FINAL_TOO_SPARSE)
-    cout << "Extraction : unsuccessful density test at final detection."
+    cout << "Extraction : unsuccessful sparsity test at final detection."
          << endl;
   else if (res == BSDetector::RESULT_FINAL_TOO_SMALL)
-    cout << "Extraction : unsuccessful spread test at final detection."
+    cout << "Extraction : unsuccessful size test at final detection."
+         << endl;
+  else if (res == BSDetector::RESULT_FINAL_TOO_FRAGMENTED)
+    cout << "Extraction : unsuccessful fragmentation test at final detection."
          << endl;
   else if (res == BSDetector::RESULT_FINAL_TOO_MANY_OUTLIERS)
     cout << "Extraction : unsuccessful filter test at final detection."

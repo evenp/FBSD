@@ -49,7 +49,7 @@ segments W.
 | Without ADS and ATC | 75.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 16.60 | 421 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 98 | 46.22 pixels ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 8.60 | 2.20 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.16 |
 | With ADS and ATC | 66.62 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 15.47 | 478 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 111 | 41.67 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.53 | 1.89 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.13 |
 
-**Table: Measure with and without ADS and ATC concepts on the York Urban Database [1]. **
+**Table: Measure with and without ADS and ATC concepts on the York Urban Database [1].**
 
 ![Figure](Images/expe.png?raw=true)
 **Figure: Automatic detection on real images: office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d) and the bounding lines of detected blurred segments without (e) and with (f) ADS and ATC concepts.**
@@ -59,9 +59,9 @@ segments W.
 | Without ADS and ATC | 29.51 | 306 | 38.58 | 2.47 |
 | With ADS and ATC  | 25.85 | 352 | 33.25 | 2.17 |
 
-**Table: Measure with and without ADS and ATC concepts on office image. **
+**Table: Measure with and without ADS and ATC concepts on office image.**
 
-Shorter execution time is achieved with the new concepts. Detected blurred segments are shorter but thinner. Obviously the constant assigned thickness augments the probabimity to extend the segments with outlier edge points as can be noticed in the detail of the office image.
+Shorter execution time is achieved with the new concepts. Detected blurred segments are shorter but thinner. Obviously the constant assigned thickness augments the probability to extend the segments with outlier edge points as can be noticed in the detail of the office image.
 
 [1] Denis, P., Elder, J.H. and Estrada, F.J.: Efficient edge-based methods for estimating Manhattan frames in urban imagery. In: European Conference on Computer Vision. Springer LNCS 5303, pp. 197-210 (2008).
 
@@ -77,17 +77,16 @@ Keyboard controls are :
 | Key | Description |
 |-----|-------------|
 | Ctrl-B | Toggles the window background (in cycle).
-| Ctrl-D | Sets density test after initial detection on or off (off by default).
 | Ctrl-K | Sets fragmentation test on or off (off by default).
-| Ctrl-L | Sets final density test on or off (off by default).
+| Ctrl-L | Sets final sparsity test on or off (off by default).
 | Ctrl-M | Sets the multi-detection on or off (off by default).
-| Ctrl-N | Sets extension test after initial detection on or off (off by default).
+| Ctrl-S | Sets final size test on or off (on by default).
 | Ctrl-U | Sets display of the blurred segment bounding lines on or off (off by default).
+| Ctrl-X | Sets ADS and ATC tools (on by default).
 | Ctrl-Y | Sets display of the blurred segment points on or off (on by default).
 |-----|-------------|
 | a   | Registers the last blurred segment.
 | c   | Withdraws the registered segments.
-| g/G | Tunes the sensitivity to the image contrast.
 | k/K | Tunes the fragments (connected components) minimal size
 | m   | Detects all the segments in the image
 | p   | Saves detection window in capture.png
@@ -96,7 +95,6 @@ Keyboard controls are :
 | s/S | Tunes the minimal size of the detected blurred segments.
 | u   | Runs the last detection again.
 | x/X | Tunes the initial assigned width.
-| 6   | Sets ADS and ATC tools (on by default).
 | <>  | Horizontal shift (on large images, example: general.png).
 | ^v  | Vertical shift (on large images, example: general.png).
 | +-  | Zoom (on large images, example: general.png).

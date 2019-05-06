@@ -55,6 +55,8 @@ public:
   static const int RESULT_FINAL_TOO_SPARSE;
   /** Extraction result : unsuccessful spread test at final detection. */
   static const int RESULT_FINAL_TOO_SMALL;
+  /** Extraction result : unsuccessful fragmentation test at final detection. */
+  static const int RESULT_FINAL_TOO_FRAGMENTED;
   /** Extraction result : unsuccessful filter test at final detection. */
   static const int RESULT_FINAL_TOO_MANY_OUTLIERS;
 
@@ -177,27 +179,15 @@ public:
   inline void setAssignedThickness (int val) { if (val > 0) inThick = val; }
 
   /**
-   * \brief Returns the assigned maximal width margin for the fast tracks.
-   */
-  inline int fastTracksMaxMargin () const { return imaxMargin; }
-
-  /**
-   * \brief Sets the assigned maximal width margin for the fast tracks.
-   * @param val New width value.
-   */
-  inline void setFastTracksMaxMargin (int val) {
-    if (val >= 0) imaxMargin = val; }
-
-  /**
    * \brief Returns the output blurred segment minimal size.
    */
-  inline int getBSminSize () const { return bsMinSize; }
+  inline int initialSizeMinValue () const { return initialMinSize; }
 
   /**
    * \brief Sets the output blurred segment minimal size.
    */
-  inline void setBSminSize (int value) {
-    if (value >= ABSOLUTE_BS_MIN_SIZE) bsMinSize = value; }
+  inline void setInitialMinSize (int value) {
+    initialMinSize = (value >= BS_MIN_SIZE ? value : BS_MIN_SIZE); }
 
   /**
    * \brief Returns the threshold used for maximal gradient detection.
@@ -279,31 +269,51 @@ public:
   void switchPreliminary ();
 
   /**
-   * \brief Returns the edge direction constraint status.
-   *    +1 : Edge direction constrained to the initial direction.
-   *    -1 : Edge direction constrained to the initial direction opposite.
-   *     0 : Edge constraint free (detects lines as well as edges).
+   * \brief Returns whether opposite edge direction is set in double edge mode.
    */
-  inline int edgeDirectionConstraint ()
+  inline bool isOppositeGradientOn () const
   {
-    return (edgeDirection);
+    return (oppositeGradientDir);
   }
 
   /**
    * \brief Inverts the edge direction for detection stage.
+   * Effective only in single edge detection mode.
+   * Returns whether the modification was actually made.
    */
-  inline void invertEdgeDirection ()
+  bool switchOppositeGradient ();
+
+  /**
+   * \brief Returns whether opposite edge direction is set in double edge mode.
+   */
+  inline bool isSingleEdgeModeOn () const
   {
-    edgeDirection = - edgeDirection;
+    if (gMap != NULL) return (gMap->isOrientationConstraintOn ());
+    return (true);
   }
 
   /**
-   * \brief Switches the edge direction constraint.
+   * \brief Switches between single and double edge detection.
    */
-  inline void switchEdgeDirectionConstraint ()
+  inline void switchSingleOrDoubleEdge ()
   {
-    edgeDirection = (edgeDirection == 0 ? 1 : 0);
-    gMap->switchOrientationConstraint ();
+    if (gMap != NULL) gMap->switchOrientationConstraint ();
+  }
+
+  /**
+   * \brief Returns whether a single edge mode is set for multidetections.
+   */
+  inline bool isSingleMultiOn () const
+  {
+    return (singleMultiOn);
+  }
+
+  /**
+   * \brief Switches between single and double edge mode for multidetections.
+   */
+  inline void switchSingleOrDoubleMultiDetection ()
+  {
+    singleMultiOn = ! singleMultiOn;
   }
 
   /**
@@ -315,16 +325,6 @@ public:
    * \brief Switches on or off the scan recentering modality.
    */
   inline void switchScanRecentering () { recenteringOn = ! recenteringOn; }
-
-  /**
-   * \brief Returns true if the fine scan is fitted to the detected segment.
-   */
-  inline bool isScanFitting () { return fittingOn; }
-
-  /**
-   * \brief Switches on or off the scan fitting modality.
-   */
-  inline void switchScanFitting () { fittingOn = ! fittingOn; }
 
   /**
    * \brief Returns true if the multi-selection modality is set.
@@ -493,23 +493,25 @@ public:
   /**
    * \brief Returns whether the density test at initial step is set.
    */
-  inline bool isDensityTestOn () const { return (densityTestOn); }
+  inline bool isInitialSparsityTestOn () const {
+    return (initialSparsityTestOn); }
 
   /**
-   * \brief Switches on or off the density test modality.
+   * \brief Switches on or off the initial density test modality.
    */
-  inline void switchDensityTest () { densityTestOn = ! densityTestOn; }
+  inline void switchInitialSparsityTest () {
+    initialSparsityTestOn = ! initialSparsityTestOn; }
 
   /**
    * \brief Returns whether the density test at final step is set.
    */
-  inline bool isFinalDensityTestOn () const { return (finalDensityTestOn); }
+  inline bool isFinalSparsityTestOn () const { return (finalSparsityTestOn); }
 
   /**
    * \brief Switches on or off the final density test modality.
    */
-  inline void switchFinalDensityTest () {
-    finalDensityTestOn = ! finalDensityTestOn; }
+  inline void switchFinalSparsityTest () {
+    finalSparsityTestOn = ! finalSparsityTestOn; }
 
   /**
    * \brief Returns whether the size test at final step is set.
@@ -526,45 +528,36 @@ public:
    * \brief Returns the minimal size of final blurred segments.
    */
   inline int finalSizeMinValue () const {
-    return (finalSizeTestOn ? finalSizeMinVal : 0); }
+    return (finalSizeTestOn ? finalMinSize : BS_MIN_SIZE); }
 
   /**
    * \brief Returns the minimal spread of final blurred segments.
    */
   inline void setFinalSizeMinValue (int val) {
-    finalSizeMinVal = (val < 0 ? 0 : val); }
-
-  /**
-   * \brief Returns whether the length test at final step is set.
-   */
-  inline bool isFinalLengthTestOn () const { return (finalLengthTestOn); }
-
-  /**
-   * \brief Switches on or off the final length test modality.
-   */
-  inline void switchFinalLengthTest () {
-    finalLengthTestOn = ! finalLengthTestOn; }
+    finalMinSize = (val < BS_MIN_SIZE ? BS_MIN_SIZE : val); }
 
   /**
    * \brief Returns the connectivity constraint status.
    */
-  inline bool isConnectivityConstraintOn () const { return (ccOn); }
+  inline bool isFinalFragmentationTestOn () const {
+    return (finalFragmentationTestOn); }
 
   /**
    * \brief Switches on or off the connectivity constraint.
    */
-  inline void switchConnectivityConstraint () { ccOn = ! ccOn; }
+  inline void switchFinalFragmentationTest () {
+    finalFragmentationTestOn = ! finalFragmentationTestOn; }
 
   /**
    * \brief Returns the minimal size of the segment connected components.
    */
-  inline int getConnectedComponentMinSize () { return ccMinSize; }
+  inline int fragmentSizeMinValue () const { return fragmentMinSize; }
 
   /**
    * \brief Increments the minimal size of the connected components.
    * @param increase Positive increment if true, negative otherwise.
    */
-  bool incConnectedComponentMinSize (bool increase);
+  bool incFragmentSizeMinValue (bool increase);
 
   /*
    * \brief Returns the count of trials in a multi-detection.
@@ -612,15 +605,15 @@ public:
                      Pt2i &p1, Pt2i &p2, int &swidth, Pt2i &pc) const;
 
   /**
-   * \brief Retuns whether the static detector (IWCIA '09) is used.
+   * \brief Retuns whether static detections (without ADS and ATC) are used.
    */
-  inline bool staticDetectorOn () { return staticDetOn; }
+  inline bool staticDetectorOn () const { return staticDetOn; }
 
   /**
-   * \brief Sets the static detector activation (IWCIA '09).
+   * \brief Sets the static detection (without ADS and ATC) activation.
    * @param status Activation status.
    */
-  inline void setStaticDetector (bool status) { staticDetOn = status; }
+  void setStaticDetector (bool status);
 
   /**
    * \brief Returns the version number.
@@ -634,16 +627,16 @@ private :
   static const int DEFAULT_FAST_TRACK_SCAN_WIDTH;
   /** Default value for the assigned thickess to detection method. */
   static const int DEFAULT_ASSIGNED_THICKNESS;
-  /** Default value for the max segment width margin for fast tracks. */
-  static const int DEFAULT_FAST_TRACK_MAX_MARGIN;
-  /** Default value for the minimal size of the detected blurred segment. */
-  static const int DEFAULT_BS_MIN_SIZE;
-  /** Absolute value for the minimal size of the detected blurred segment. */
-  static const int ABSOLUTE_BS_MIN_SIZE;
+  /** Additional assigned thickness margin for fast tracks. */
+  static const int FAST_TRACK_MARGIN;
+  /** Default minimal size of the initial blurred segment. */
+  static const int DEFAULT_INITIAL_MIN_SIZE;
+  /** Minimal size of a blurred segment. */
+  static const int BS_MIN_SIZE;
   /** Default minimal size of the final blurred segment. */
   static const int DEFAULT_FINAL_MIN_SIZE;
-  /** Default value for the minimal size of connected components. */
-  static const int DEFAULT_CONNECT_MIN_SIZE;
+  /** Default value for the minimal size of segment fragments. */
+  static const int DEFAULT_FRAGMENT_MIN_SIZE;
   /** Default value of the stroke sweeping step for automatic detections. */
   static const int DEFAULT_AUTO_SWEEPING_STEP;
   /** Default value for the preliminary stroke half length. */
@@ -653,36 +646,33 @@ private :
   /** Gradient map. */
   VMap *gMap;
 
-  /** Direction constraint of the detected edge :
-   *    +1 : complies to initial direction
-   *    -1 : complies to initial direction opposite
-   *     0 : no direction condition (detects lines as well as edges)
+  /** Selects points with opposite gradient direction.
+   *  Opposite to gradient direction at start point.
+   *  Used to detect two close edges with opposite gradients.
    */
-  int edgeDirection;
-  /** Minimal size of the detected blurred segment. */
-  int bsMinSize;
-  /** Connectivity constraint status. */
-  bool ccOn;
-  /** Minimal size of the connected components to validate a blurred segment. */
-  int ccMinSize;
+  bool oppositeGradientDir;
+  /** Minimal size of the initial segment. */
+  int initialMinSize;
+  /** Final fragmentation test status. */
+  bool finalFragmentationTestOn;
+  /** Minimal size of the segment fragments. */
+  int fragmentMinSize;
   /** Automatic scan recentering (based on previous detection). */
   bool recenteringOn;
-  /** Automatic scan width selection (based on previous detection). */
-  bool fittingOn;
-  /** Density test modality after initial detection. */
-  bool densityTestOn;
-  /** Density test modality after final detection. */
-  bool finalDensityTestOn;
-  /** Length test modality after final detection. */
-  bool finalLengthTestOn;
+  /** Sparsity test modality after initial detection. */
+  bool initialSparsityTestOn;
+  /** Sparsity test modality after final detection. */
+  bool finalSparsityTestOn;
   /** Size test modality after final detection. */
   bool finalSizeTestOn;
-  /** Size test minimal value. */
-  int finalSizeMinVal;
+  /** Minimal size of the final segment. */
+  int finalMinSize;
   /** Count of small BS eliminated by the spread test. */
   int nbSmallBS;
   /** Segment multi-selection modality status. */
   bool multiSelection;
+  /** Single or double mode for multi-selections. */
+  bool singleMultiOn;
   /** Count of trials in a multi-detection. */
   int nbtrials;
   /** Maximum number of trials in a multi-detection. */
@@ -698,8 +688,6 @@ private :
 
   /** Assigned maximal thickness to the detector. */
   int inThick;
-  /** Assigned maximal width margin for fast tracks. */
-  int imaxMargin;
 
   /** Last input start point. */
   Pt2i prep1;
@@ -731,8 +719,8 @@ private :
 
   /** Fine tracker. */
   BSTracker *bst2;
-  /** Old detector (IWCIA'09) fine tracker. */
-  BSTracker *bstold;
+  /** Fine tracker for static detections (without ADS and ATC). */
+  BSTracker *bstStatic;
   /** Detected blurred segment (final result). */
   BlurredSegment *bsf;
   /** Detected blurred segments in case of multi-detection (final results). */

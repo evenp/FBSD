@@ -73,8 +73,8 @@ BSRandomTester::BSRandomTester ()
   for (int i = 0; i < nbdets; i++)
   {
     detectors[i].setAssignedThickness (smaxwidth + swmargin);
-    if (! detectors[i].isFinalLengthTestOn ())
-      detectors[i].switchFinalLengthTest ();
+    if (! detectors[i].isFinalSizeTestOn ())
+      detectors[i].switchFinalSizeTest ();
   }
   detectors[0].setStaticDetector (true);
   detectors[1].setStaticDetector (false);
@@ -139,10 +139,12 @@ void BSRandomTester::randomTest ()
     if (gMap != NULL) delete gMap;
     gMap = new VMap (width, height, getBitmap (image), VMap::TYPE_SOBEL_5X5);
     gMap->incGradientThreshold (50 - gMap->getGradientThreshold ());
-    if (gMap->isOrientationConstraintOn ())
-      gMap->switchOrientationConstraint ();
     for (int det = 0; det < nbdets; det ++)
+    {
       detectors[det].setGradientMap (gMap);
+      if (detectors[det].isSingleEdgeModeOn ())
+        detectors[det].switchSingleOrDoubleEdge ();
+    }
 
     for (int det = 0; det < nbdets; det ++)
     {

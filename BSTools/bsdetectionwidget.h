@@ -74,6 +74,46 @@ public:
   void buildGradientImage (int dir);
 
   /**
+   * \brief Requires the accumulation window closure.
+   */
+  // void closeAccuAnalyzer ();
+
+  /**
+   * \brief Requires the pixel analysis window closure.
+   */
+  void closePixelAnalyzer ();
+
+  /**
+   * \brief Requires the profile analysis window closure.
+   */
+  void closeProfileAnalyzer ();
+
+  /**
+   * \brief Requires the initial detection analysis window closure.
+   */
+  void closeIdetAnalyzer ();
+
+  /**
+   * \brief Switches the pixel display window on or off.
+   */
+  void switchPixelAnalyzer ();
+
+  /**
+   * \brief Switches the accumulator display window on or off.
+   */
+  // void switchAccuAnalyzer ();
+
+  /**
+   * \brief Switches the profile display window on or off.
+   */
+  void switchProfileAnalyzer ();
+
+  /**
+   * \brief Switches the initial detection display window on or off.
+   */
+  void switchIdetAnalyzer ();
+
+  /**
    * \brief Return whether the blurred segment highlight colors are set.
    */
   inline bool isHighlightColorsOn () const { return darkHighlightOn; }
