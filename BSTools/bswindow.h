@@ -33,6 +33,26 @@ public:
   void setFile (QString fileName);
 
   /**
+   * Switches the initial detection analysis window on or off.
+   */
+  inline void toggleIdetWindow () { showIdet = ! showIdet; }
+
+  /**
+   * Switches the profile analysis window on or off.
+   */
+  inline void toggleProfWindow () { showProf = ! showProf; }
+
+  /**
+   * Switches the accumulator analysis window on or off.
+   */
+  // inline void toggleAccuWindow () { showAccu = ! showAccu; }
+
+  /**
+   * Switches the segment analysis window on or off.
+   */
+  inline void toggleSegWindow () { showSeg= ! showSeg; }
+
+  /**
    * Sets the gradient extraction method to be used.
    */
   inline void useGradient (int type) { gradType = type; }
@@ -62,6 +82,10 @@ private:
 
   /** Blurred segment detection widget. */
   BSDetectionWidget *detectionWidget;
+  bool showIdet;
+  bool showProf;
+  // bool showAccu;
+  bool showSeg;
   int gradType;
 
   void createActions ();

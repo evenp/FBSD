@@ -70,6 +70,7 @@ int main (int argc, char *argv[])
     if (gMap != NULL) delete gMap;
     gMap = new VMap (width, height, tabImage, VMap::TYPE_SOBEL_5X5);
     detector.setGradientMap (gMap);
+    if (xt) detector.setStaticDetector (true);
     // buildGradientImage (0);
     detector.detectAll ();
     ofstream outf ("naivelines.txt", ios::out);

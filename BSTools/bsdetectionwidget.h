@@ -124,9 +124,9 @@ public:
   void switchHighlightColors ();
 
   /**
-   * \brief Returns whether random color display modality is set.
+   * \brief Returns the blurred segment color style for display.
    */
-  inline bool isArlequinOn () const { return arlequinOn; }
+  inline int activeColorSet () const { return bscolorset; }
 
   /**
    * \brief Switches the random color display modality.
@@ -238,20 +238,28 @@ private:
 
   /** Kind of highlight colors. */
   bool darkHighlightOn;
-  /** Random color selection modality. */
-  bool arlequinOn;
+  /** Color style to display blurred segments. */
+  int bscolorset;
   /** Color of user selections. */
   QColor selectionColor;
-  /** Color of blurred segments. */
+  /** Stylized color of blurred segments. */
   QColor bsColor;
-  /** Color of highlighted blurred segments. */
+  /** Stylized color of highlighted blurred segments. */
   QColor bsHighColor;
+  /** Neutral color of blurred segments. */
+  QColor bsColor2;
+  /** Neutral color of highlighted blurred segments. */
+  QColor bsHighColor2;
   /** Flag indicating whether blurred segments points are visible. */
   bool bsPointsVisible;
-  /** Color of blurred segments bounds. */
+  /** Stylized color of blurred segments bounds. */
   QColor boundColor;
-  /** Color of highlighted blurred segments bounds. */
+  /** Stylized color of highlighted blurred segments bounds. */
   QColor boundHighColor;
+  /** Neutral color of blurred segments bounds. */
+  QColor boundColor2;
+  /** Neutral color of highlighted blurred segments bounds. */
+  QColor boundHighColor2;
   /** Flag indicating whether blurred segments bounds are visible. */
   bool bsBoundsVisible;
   /** Background type.
@@ -347,10 +355,11 @@ private:
   /**
    * \brief Draws a blurred segment.
    * @param painter Drawing device.
+   * @param style Flag indicating if specific drawing style is set.
    * @param bs Reference to the blurred segment to be drawn.
    * @param high Flag indicated whether the blurred segment is highlighted.
    */
-  void drawBlurredSegment (QPainter &painter,
+  void drawBlurredSegment (QPainter &painter, bool style,
                            BlurredSegment *bs, bool high = true);
 
   /**

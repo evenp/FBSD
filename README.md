@@ -38,10 +38,11 @@ and the found value (1.4 pixel) was taken into account in the test. Results are 
 | F-measure (harmonic mean) (%) : F = 2 x P x R /(P + R)  | 84.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.42 | 87.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.59 |
 | Thickness difference (in pixels) to matched input segment  | 0.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.24 | 0.59 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.19 |
 | Angle difference (in degrees) to matched input segment  | 0.61 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.66 | 0.57 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.62 |
+
 **Table 1: Measured performance on 1000 synthesized images without and with adaptive directional scans and assigned width control.**
 
 ## 2. Experimentations on real images
-Next tests compare both versions on real images: first the set of 102 images of the York Urban data base [1], then selected images for more detailed visual analysis. Reported measures are execution time T, number of output line segments N,
+Next tests compare both versions on real images: first the set of 102 images of York Urban data base [1], then selected images for more detailed visual analysis. Reported measures are execution time T, number of output line segments N,
 mean length of output line segments L, and mean thickness of output line
 segments W.
 
@@ -53,7 +54,8 @@ segments W.
 **Table 2: Measure with and without ADS and ATC concepts on the York Urban Database [1].**
 
 ![Figure](Images/expe1.png?raw=true)
-**Figure 2: Automatic detection on real images: office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
+
+**Figure 2: Automatic detection on real images: 800x533 office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
 
 | Measure  | T (ms) | N | L (pixels) | W (pixels) | 
 | :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
@@ -62,7 +64,18 @@ segments W.
 
 **Table 3: Measure with and without ADS and ATC concepts on office image.**
 
-Shorter execution time is achieved with the new concepts. Detected blurred segments are shorter but thinner. Obviously the constant assigned thickness augments the probability to extend the segments with outlier edge points as can be noticed in the detail of the office image.
+![Figure](Images/expe2.png?raw=true)
+
+**Figure 3: Automatic detection on real images: 768x512 castle image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
+
+| Measure  | T (ms) | N | L (pixels) | W (pixels) |
+| :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
+| Without ADS and ATC | 104.30 | 361 | 36.58 | 2.23 |
+| With ADS and ATC  | 94.21 | 424 | 32.18 | 1.98 |
+
+**Table 4: Measure with and without ADS and ATC concepts on castle image.**
+
+Shorter execution time is achieved with the new concepts. Detected blurred segments are shorter but thinner. Obviously the constant assigned thickness augments the probability to extend the segments with outlier edge points as can be noticed in the detail of office and castle images. Moreover, brick joints are better detected in castle image.
 
 [1] Denis, P., Elder, J.H. and Estrada, F.J.: Efficient edge-based methods for estimating Manhattan frames in urban imagery. In: European Conference on Computer Vision. Springer LNCS 5303, pp. 197-210 (2008).
 

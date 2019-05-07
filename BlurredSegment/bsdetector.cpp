@@ -107,8 +107,9 @@ void BSDetector::setGradientMap (VMap *data)
   gMap = data;
   if (prelimDetectionOn) bst0->setGradientMap (data);
   if (staticDetOn) bstStatic->setGradientMap (data);
-  bst1->setGradientMap (data);
-  bst2->setGradientMap (data);
+  if (bst1) bst1->setGradientMap (data);
+  if (bst2) bst2->setGradientMap (data);
+  if (bstStatic) bstStatic->setGradientMap (data);
 }
 
 
@@ -534,6 +535,18 @@ int BSDetector::staticDetect (const Pt2i &p1, const Pt2i &p2,
     bsf = bsf2;
   }
 
+  // Size test
+  //------------
+  if (finalSizeTestOn)
+  {
+    // DigitalStraightSegment *dss = bsf->getSegment ();
+    if ((int) (bsf->getAllPoints().size ()) < finalMinSize)
+    {
+      // nbSmallBS ++;
+      return RESULT_FINAL_TOO_SMALL;
+    }
+  }
+
   // Final sparsity test
   //-----------------
   if (finalSparsityTestOn)
@@ -704,7 +717,7 @@ void BSDetector::setStaticDetector (bool status)
   else if (status && ! staticDetOn)
   {
     bstStatic = new BSTracker ();
-    bstStatic->setGradientMap (gMap);
+    if (gMap) bstStatic->setGradientMap (gMap);
     if (bstStatic->dynamicScansOn ()) bstStatic->toggleDynamicScans ();
     if (bstStatic->isAssignedThicknessControlOn ())
       bstStatic->toggleAssignedThicknessControl ();

@@ -8,6 +8,10 @@
 BSWindow::BSWindow (int *val)
 {
   Q_UNUSED (val);
+  showIdet = false;
+  showProf = false;
+  // showAccu = false;
+  showSeg = false;
   gradType = VMap::TYPE_SOBEL_5X5;
   detectionWidget = new BSDetectionWidget;
   setCentralWidget (detectionWidget);
@@ -21,6 +25,10 @@ BSWindow::BSWindow (int *val)
 
 BSWindow::BSWindow ()
 {
+  showIdet = false;
+  showProf = false;
+  // showAccu = false;
+  showSeg = false;
   gradType = 0;
   detectionWidget = new BSDetectionWidget;
   setCentralWidget (detectionWidget);

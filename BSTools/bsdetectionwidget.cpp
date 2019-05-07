@@ -44,13 +44,17 @@ BSDetectionWidget::BSDetectionWidget (QWidget *parent)
 
   // Sets display parameters
   darkHighlightOn = false;
-  arlequinOn = true;
+  bscolorset = 0;
   selectionColor = Qt::red;
   bsColor = Qt::blue;
   bsHighColor = Qt::yellow;
+  bsColor2 = Qt::green;
+  bsHighColor2 = Qt::black;
   bsPointsVisible = true;
   boundColor = Qt::green;
   boundHighColor = Qt::magenta;
+  boundColor2 = Qt::green;
+  boundHighColor2 = Qt::black;
 
   maxWidth = 768;
   maxHeight = 512;
@@ -207,7 +211,8 @@ void BSDetectionWidget::switchHighlightColors ()
 
 void BSDetectionWidget::switchArlequin ()
 {
-  arlequinOn = ! arlequinOn;
+  bscolorset ++;
+  if (bscolorset == 3) bscolorset = 0;
 }
 
 
@@ -487,15 +492,15 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_O :
-        // Outputs the detected segment
-        cout << "Outputs detection result" << endl;
-        writeDetectionResult ();
+      // Outputs the detected segment
+      cout << "Outputs detection result" << endl;
+      writeDetectionResult ();
       break;
 
     case Qt::Key_P :
-        // Captures main window
-        cout << "Saves main window in capture.png" << endl;
-        augmentedImage.save ("capture.png");
+      // Captures main window
+      cout << "Saves main window in capture.png" << endl;
+      augmentedImage.save ("capture.png");
       break;
 
     case Qt::Key_Q :
@@ -516,11 +521,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_R :
-        // Tunes the sweeping step value for automatic detections
-        detector.setAutoSweepingStep (detector.getAutoSweepingStep () +
-          (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Stroke sweeping step for automatic detections = "
-             << detector.getAutoSweepingStep () << " pixels" << endl;
+      // Tunes the sweeping step value for automatic detections
+      detector.setAutoSweepingStep (detector.getAutoSweepingStep () +
+        (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
+      cout << "Stroke sweeping step for automatic detections = "
+           << detector.getAutoSweepingStep () << " pixels" << endl;
       break;
 
     case Qt::Key_S :
@@ -656,7 +661,11 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
 
     case Qt::Key_Equal :
       switchArlequin ();
-      cout << "Random coloring " << (isArlequinOn () ? "on" : "off") << endl;
+      if (activeColorSet () == 0)
+        cout << "Random color blurred segments" << endl;
+      else if (activeColorSet () == 1)
+        cout << "Stylized color blurred segments" << endl;
+      else cout << "Neutral color blurred segments" << endl;
       displayDetectionResult ();
       break;
 
@@ -792,7 +801,7 @@ void BSDetectionWidget::drawSelection (QPainter &painter,
 }
 
 
-void BSDetectionWidget::drawBlurredSegment (QPainter &painter,
+void BSDetectionWidget::drawBlurredSegment (QPainter &painter, bool style,
                                             BlurredSegment *bs, bool high)
 {
   if (bs != NULL)
@@ -804,11 +813,15 @@ void BSDetectionWidget::drawBlurredSegment (QPainter &painter,
       if (dss != NULL)
       {
         dss->getBounds (bnd, 0, 0, width, height);
-        drawPoints (painter, bnd, high ? boundHighColor : boundColor);
+        drawPoints (painter, bnd,
+                    high ? (style ? boundHighColor : boundHighColor2)
+                         : (style ? boundColor : boundColor2));
       }
     }
     if (bsPointsVisible)
-      drawPoints (painter, bs->getAllPoints (), high ? bsHighColor : bsColor);
+      drawPoints (painter, bs->getAllPoints (),
+                  high ? (style ? bsHighColor : bsHighColor2)
+                       : (style ? bsColor : bsColor2));
   }
 }
 
@@ -948,32 +961,22 @@ void BSDetectionWidget::displayDetectionResult ()
   vector<BlurredSegment *> bss = detector.getBlurredSegments ();
   if (! bss.empty ())
   {
-//    cout << bss.size () << " blurred segments detected" << endl;
-//    double bsw = 0.;
-//    int bsc = 0;
-    if (arlequinOn && detector.getMaxDetections () == 0) srand (time (NULL));
+    if (bscolorset == 0 && detector.getMaxDetections () == 0)
+      srand (time (NULL));
     vector<BlurredSegment *>::const_iterator it = bss.begin ();
     while (it != bss.end ())
     {
-//      if ((*it) != NULL)
-//      {
-//        DigitalStraightSegment *dss = (*it)->getSegment ();
-//        bsc++;
-//        if (dss == NULL) cout << "DSS null" << endl;
-//        else bsw += dss->width () / (double) dss->period ();
-//      }
-      if (arlequinOn && detector.getMaxDetections () == 0)
+      if (bscolorset == 0 && detector.getMaxDetections () == 0)
         drawArlequinSegment (painter, *it);
       else
-        drawBlurredSegment (painter, *it, detector.getMaxDetections () == 0
-                                          || *it == bss.back ());
+        drawBlurredSegment (painter, bscolorset == 1, *it,
+                 detector.getMaxDetections () == 0 || *it == bss.back ());
       it++;
     }
-//    cout << bsc << " effective blurred segments" << endl;
-//    if (bsc != 0) cout << "Mean width is " << bsw / bsc << endl;
   }
   else
-    drawBlurredSegment (painter, detector.getBlurredSegment ());
+    drawBlurredSegment (painter, bscolorset <= 1,
+                        detector.getBlurredSegment ());
   if (udef) drawSelection (painter, p1, p2);
   update (QRect (QPoint (0, 0), QPoint (width, height)));
 
@@ -999,7 +1002,7 @@ void BSDetectionWidget::displaySavedSegments ()
     vector<ExtractedSegment>::iterator it = extractedSegments.begin ();
     while (it != extractedSegments.end ())
     {
-      drawBlurredSegment (painter, it->bs);
+      drawBlurredSegment (painter, bscolorset <= 1, it->bs);
       drawSelection (painter, it->p1, it->p2);
       it ++;
     }
