@@ -26,7 +26,7 @@ and the found value (1.4 pixel) was taken into account in the test. Results are 
 ![Figure](Images/statsoldBounds.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
 ![Figure](Images/statsnewBounds.png?raw=true)
 
-**Figure: Evaluation on synthesized images: one of the randomly generated images(left), bounding lines of output blurred segments without (middle) and with (right) ADS and ATC concepts.**
+**Figure 1: Evaluation on synthesized images: one of the randomly generated images(left), bounding lines of output blurred segments without (middle) and with (right) ADS and ATC concepts.**
 
 | ADS and ATC Concepts | Without | With |
 | :---          |     :---:     |     :---:     | 
@@ -38,6 +38,7 @@ and the found value (1.4 pixel) was taken into account in the test. Results are 
 | F-measure (harmonic mean) (%) : F = 2 x P x R /(P + R)  | 84.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.42 | 87.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.59 |
 | Thickness difference (in pixels) to matched input segment  | 0.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.24 | 0.59 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.19 |
 | Angle difference (in degrees) to matched input segment  | 0.61 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.66 | 0.57 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.62 |
+**Table 1: Measured performance on 1000 synthesized images without and with adaptive directional scans and assigned width control.**
 
 ## 2. Experimentations on real images
 Next tests compare both versions on real images: first the set of 102 images of the York Urban data base [1], then selected images for more detailed visual analysis. Reported measures are execution time T, number of output line segments N,
@@ -49,17 +50,17 @@ segments W.
 | Without ADS and ATC | 75.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 16.60 | 421 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 98 | 46.22 pixels ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 8.60 | 2.20 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.16 |
 | With ADS and ATC | 66.62 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 15.47 | 478 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 111 | 41.67 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.53 | 1.89 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.13 |
 
-**Table: Measure with and without ADS and ATC concepts on the York Urban Database [1].**
+**Table 2: Measure with and without ADS and ATC concepts on the York Urban Database [1].**
 
-![Figure](Images/expe.png?raw=true)
-**Figure: Automatic detection on real images: office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d) and the bounding lines of detected blurred segments without (e) and with (f) ADS and ATC concepts.**
+![Figure](Images/expe1.png?raw=true)
+**Figure 2: Automatic detection on real images: office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
 
 | Measure  | T (ms) | N | L (pixels) | W (pixels) | 
 | :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
-| Without ADS and ATC | 29.51 | 306 | 38.58 | 2.47 |
-| With ADS and ATC  | 25.85 | 352 | 33.25 | 2.17 |
+| Without ADS and ATC | 48.16 | 254 | 53.92 | 1.99 |
+| With ADS and ATC  | 42.17 | 285 | 49.69 | 1.69 |
 
-**Table: Measure with and without ADS and ATC concepts on office image.**
+**Table 3: Measure with and without ADS and ATC concepts on office image.**
 
 Shorter execution time is achieved with the new concepts. Detected blurred segments are shorter but thinner. Obviously the constant assigned thickness augments the probability to extend the segments with outlier edge points as can be noticed in the detail of the office image.
 
