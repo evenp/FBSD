@@ -5,6 +5,8 @@ Compilation by qmake and make
 
 Execution : `FBSD <imageName>`
 
+Detects ans edits segments in naivelines.txt : `FBSD -out <imageName>`
+
 Test on synthetized images : `FBSD -random` (requires some patience)
 
 <a href="http://ipol-geometry.loria.fr/~kerautre/ipol_demo/FBSD_IPOLDemo">Online demo</a> also available.
@@ -92,23 +94,26 @@ Keyboard controls are :
 |-----|-------------|
 | Ctrl-B | Toggles the window background (in cycle).
 | Ctrl-K | Sets fragmentation test on or off (off by default).
-| Ctrl-L | Sets final sparsity test on or off (off by default).
 | Ctrl-M | Sets the multi-detection on or off (off by default).
+| Ctrl-O | Sets the detection measurement display or off (off by default).
 | Ctrl-S | Sets final size test on or off (on by default).
-| Ctrl-U | Sets display of the blurred segment bounding lines on or off (off by default).
 | Ctrl-X | Sets ADS and ATC tools (on by default).
-| Ctrl-Y | Sets display of the blurred segment points on or off (on by default).
+| Ctrl-Y | Sets final sparsity test on or off (off by default).
 |-----|-------------|
 | a   | Registers the last blurred segment.
-| c   | Withdraws the registered segments.
-| k/K | Tunes the fragments (connected components) minimal size
-| m   | Detects all the segments in the image
+| b/B | Sets image gray level.
+| c/C | Toggles blurred segment color set.
+| d/D | Toggles blurred segment display style.
+| k/K | Tunes the fragments (connected components) minimal size.
+| m   | Detects all the segments in the image.
+| o   | Saves detected segment(s) in seg(s).txt
 | p   | Saves detection window in capture.png
 | q   | Displays all the registered blurred segments.
 | r/R | Tunes the stroke sweeping step of automatic detections.
-| s/S | Tunes the minimal size of the detected blurred segments.
+| s/S | Tunes the minimal size of detected blurred segments.
 | u   | Runs the last detection again.
-| x/X | Tunes the initial assigned width.
+| w/W | Tunes the initial assigned width.
+| x   | Withdraws the registered segments.
 | <>  | Horizontal shift (on large images, example: general.png).
 | ^v  | Vertical shift (on large images, example: general.png).
 | +-  | Zoom (on large images, example: general.png).

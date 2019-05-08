@@ -39,22 +39,21 @@ BSDetectionWidget::BSDetectionWidget (QWidget *parent)
   verbose = false;
   statsOn = false;
   background = BACK_IMAGE;
-  bsBoundsVisible = false;
   blevel = 0;
 
   // Sets display parameters
-  darkHighlightOn = false;
-  bscolorset = 0;
+  bsDisplay = 1;
+  arlequin = 0;
+  bsColor = 2;
+  bsHighColor[0] = Qt::black;
+  bsLowColor[0] = Qt::gray;
+  bsHighColor[1] = Qt::blue;
+  bsLowColor[1] = Qt::magenta;
+  bsHighColor[2] = Qt::yellow;
+  bsLowColor[2] = Qt::red;
+  bsHighColor[3] = Qt::white;
+  bsLowColor[3] = Qt::gray;
   selectionColor = Qt::red;
-  bsColor = Qt::blue;
-  bsHighColor = Qt::yellow;
-  bsColor2 = Qt::green;
-  bsHighColor2 = Qt::black;
-  bsPointsVisible = true;
-  boundColor = Qt::green;
-  boundHighColor = Qt::magenta;
-  boundColor2 = Qt::green;
-  boundHighColor2 = Qt::black;
 
   maxWidth = 768;
   maxHeight = 512;
@@ -193,26 +192,13 @@ void BSDetectionWidget::paintEvent (QPaintEvent *)
 }
 
 
-void BSDetectionWidget::switchHighlightColors ()
+void BSDetectionWidget::switchColorSet (bool back)
 {
-  darkHighlightOn = ! darkHighlightOn;
-  if (darkHighlightOn)
+  if (back)
   {
-    bsHighColor = Qt::black;
-    boundHighColor = Qt::blue;
+    if (--bsColor < 0) bsColor = 3;
   }
-  else
-  {
-    bsHighColor = Qt::yellow;
-    boundHighColor = Qt::magenta;
-  }
-}
-
-
-void BSDetectionWidget::switchArlequin ()
-{
-  bscolorset ++;
-  if (bscolorset == 3) bscolorset = 0;
+  else if (++ bsColor > 3) bsColor = 0;
 }
 
 
@@ -335,26 +321,38 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       }
       else
       {
-        // Tunes the gradient resolution for gradient local max filtering
-        detector.incGradientResolution (
-          (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Gradient resolution = "
-             << detector.getGradientResolution () << endl;
-        extract ();
+        // Tunes the background image black level
+        incBlackLevel ((event->modifiers () & Qt::ShiftModifier) ? -1 : 1);
+        cout << "Background black level = " << getBlackLevel () << endl;
+        displayDetectionResult ();
       }
       break;
 
     case Qt::Key_C :
-      // Clears the registered blurred segments
-      cout << "Withdraws registered segments" << endl;
-      clearSavedSegments ();
+      // Toggles blurred segment color set
+      switchColorSet (event->modifiers () & Qt::ShiftModifier);
+      displayDetectionResult ();
+      break;
+
+    case Qt::Key_D :
+      // Toggles blurred segment display style
+      toggleBlurredSegmentDisplay (event->modifiers () & Qt::ShiftModifier);
+      if (bsDisplay == 0)
+        cout << "Blurred segment display : unvisible" << endl;
+      else if (bsDisplay == 1)
+        cout << "Blurred segment display : points" << endl;
+      else if (bsDisplay == 2)
+        cout << "Blurred segment display : bounds" << endl;
+      else if (bsDisplay == 3)
+        cout << "Blurred segment display : bounds and points" << endl;
+      displayDetectionResult ();
       break;
 
     case Qt::Key_E :
       {
-        // Handles single or double edge detection
         if (event->modifiers () & Qt::ControlModifier)
         {
+          // Handles single or double edge detection
           detector.switchSingleOrDoubleEdge ();
           if (detector.isSingleEdgeModeOn ())
             cout << "Single edge detection set ("
@@ -363,9 +361,9 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
           else cout << "Double edge detection set" << endl;
           extract ();
         }
-        // Handles gradient orientation direction for the detection
         else
         {
+          // Handles gradient orientation direction for the detection
           if (detector.switchOppositeGradient ())
           {
             cout << "Single edge detection set ("
@@ -430,26 +428,6 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       }
       break;
 
-    case Qt::Key_L :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches sparsity test at final step
-        detector.switchFinalSparsityTest ();
-        cout << "Final sparsity test : "
-             << (detector.isFinalSparsityTestOn () ? "on" : "off") << endl;
-        extract ();
-      }
-      else
-      {
-        // Tunes the initial segment minimal size
-        detector.setInitialMinSize (detector.initialSizeMinValue () +
-          (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Initial segment min size = "
-             << detector.initialSizeMinValue () << endl;
-        extract ();
-      }
-      break;
-
     case Qt::Key_M :
       if (event->modifiers () & Qt::ControlModifier)
       {
@@ -492,9 +470,19 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_O :
-      // Outputs the detected segment
-      cout << "Outputs detection result" << endl;
-      writeDetectionResult ();
+      if (event->modifiers () & Qt::ControlModifier)
+      {
+        // Switches measured values display
+        switchStats ();
+        cout << "Stats display " << (isStatsOn () ? "on" : "off") << endl;
+        displayDetectionResult ();
+      }
+      else
+      {
+        // Outputs the detected segment(s)
+        cout << "Outputs detection result" << endl;
+        writeDetectionResult ();
+      }
       break;
 
     case Qt::Key_P :
@@ -504,20 +492,9 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_Q :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches the scan flexibility
-        detector.switchDynamicScans ();
-        cout << (detector.dynamicScansOn () ?
-                 "Dynamic scans" : "Static scans") << endl;
-        extract ();
-      }
-      else
-      {
-        // Displays registered blurred segments
-        cout << "Displays all registered segments" << endl;
-        displaySavedSegments ();
-      }
+      // Displays registered blurred segments
+      cout << "Displays all registered segments" << endl;
+      displaySavedSegments ();
       break;
 
     case Qt::Key_R :
@@ -569,21 +546,10 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       break;
 
     case Qt::Key_U :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches the display of the detected blurred segment bounds
-        bsBoundsVisible = ! bsBoundsVisible;
-        cout << "Enclosing segments "
-             << (bsBoundsVisible ? "visible" : "hidden") << endl;
-        extract ();
-      }
-      else
-      {
-        // Replays last extraction
-        cerr << "p1 update: " << p1.x () << " " << p1.y () << endl;
-        cerr << "p2 update: " << p2.x () << " " << p2.y () << endl;
-        extract ();
-      }
+      // Replays last extraction
+      cerr << "p1 update: " << p1.x () << " " << p1.y () << endl;
+      cerr << "p2 update: " << p2.x () << " " << p2.y () << endl;
+      extract ();
       break;
 
     case Qt::Key_V :
@@ -592,9 +558,19 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
         switchVerbose ();
       break;
 
+    case Qt::Key_W :
+      // Tunes the assigned thickness to detector
+      detector.setAssignedThickness (detector.assignedThickness () +
+        (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
+      cout << "Assigned thickness = "
+           << detector.assignedThickness () << endl;
+      extract ();
+      break;
+
     case Qt::Key_X :
       if (event->modifiers () & Qt::ControlModifier)
       {
+        // Switches the static detection modality
         detector.setStaticDetector (! (detector.staticDetectorOn ()));
         cout << (detector.staticDetectorOn () ?
                  "Static (without ADS and ATC) detector set" :
@@ -603,81 +579,34 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
       }
       else
       {
-        // Tunes the assigned thickness to detector
-        detector.setAssignedThickness (detector.assignedThickness () +
-          (event->modifiers () & Qt::ShiftModifier ? -1 : 1));
-        cout << "Assigned thickness = "
-             << detector.assignedThickness () << endl;
-        extract ();
+        // Clears the registered blurred segments
+        cout << "Withdraws registered segments" << endl;
+        clearSavedSegments ();
+        displaySavedSegments ();
       }
       break;
 
     case Qt::Key_Y :
       if (event->modifiers () & Qt::ControlModifier)
       {
-        // Switches the display of the detected blurred segment pixels
-        bsPointsVisible = ! bsPointsVisible;
-        cout << "Blurred segment "
-             << (bsPointsVisible ? "visible" : "hidden") << endl;
-        displayDetectionResult ();
-      }
-      else
-      {
-        // Tunes the background image black level
-        incBlackLevel ((event->modifiers () & Qt::ShiftModifier) ? -1 : 1);
-        cout << "Background black level = " << getBlackLevel () << endl;
-        displayDetectionResult ();
-      }
-      break;
-
-    case Qt::Key_Z :
-      if (event->modifiers () & Qt::ControlModifier)
-      {
-        // Switches the assigned thickness control
-        detector.toggleAssignedThicknessControl ();
-        cout << "Assigned thickness control "
-             << (detector.isAssignedThicknessControlOn () ? "on" : "off")
-             << endl;
-        extract ();
-      }
-      else
-      {
-        // Tunes the assigned thickness control delay
-        detector.incAssignedThicknessControlDelay (
-          (event->modifiers () & Qt::ShiftModifier) ? -1 : 1);
-        cout << "Assigned thickness control delay = "
-             << detector.getAssignedThicknessControlDelay ()
-             << " pixels" << endl;
+        // Switches sparsity test at final step
+        detector.switchFinalSparsityTest ();
+        cout << "Final sparsity test : "
+             << (detector.isFinalSparsityTestOn () ? "on" : "off") << endl;
         extract ();
       }
       break;
 
     case Qt::Key_Exclam :
-      switchHighlightColors ();
-      cout << "Highlight colors "
-           << (isHighlightColorsOn () ? "on" : "off") << endl;
+      // Displays segments with dark random colors
+      arlequin = 1;
       displayDetectionResult ();
       break;
 
-    case Qt::Key_Equal :
-      switchArlequin ();
-      if (activeColorSet () == 0)
-        cout << "Random color blurred segments" << endl;
-      else if (activeColorSet () == 1)
-        cout << "Stylized color blurred segments" << endl;
-      else cout << "Neutral color blurred segments" << endl;
+    case Qt::Key_Colon :
+      // Displays segments with light random colors
+      arlequin = -1;
       displayDetectionResult ();
-      break;
-
-    case Qt::Key_Asterisk :
-      switchStats ();
-      cout << "Stats display " << (isStatsOn () ? "on" : "off") << endl;
-      displayDetectionResult ();
-      break;
-
-    case Qt::Key_Dollar :
-      writeTest ();
-      cout << "Selection stroke saved" << endl;
       break;
 
     case Qt::Key_Plus :
@@ -749,6 +678,17 @@ void BSDetectionWidget::keyPressEvent (QKeyEvent *event)
 }
 
 
+void BSDetectionWidget::toggleBlurredSegmentDisplay (bool getBack)
+{
+  if (getBack)
+  {
+    if (--bsDisplay < 0) bsDisplay = 3;
+  }
+  else if (++bsDisplay > 3) bsDisplay = 0;
+}
+
+
+
 void BSDetectionWidget::drawPoints (QPainter &painter,
                                     vector<Pt2i> pts, QColor color)
 {
@@ -801,12 +741,12 @@ void BSDetectionWidget::drawSelection (QPainter &painter,
 }
 
 
-void BSDetectionWidget::drawBlurredSegment (QPainter &painter, bool style,
+void BSDetectionWidget::drawBlurredSegment (QPainter &painter,
                                             BlurredSegment *bs, bool high)
 {
   if (bs != NULL)
   {
-    if (bsBoundsVisible)
+    if (bsDisplay >= 2) // Bounds
     {
       vector<Pt2i> bnd;
       DigitalStraightSegment *dss = bs->getSegment ();
@@ -814,14 +754,13 @@ void BSDetectionWidget::drawBlurredSegment (QPainter &painter, bool style,
       {
         dss->getBounds (bnd, 0, 0, width, height);
         drawPoints (painter, bnd,
-                    high ? (style ? boundHighColor : boundHighColor2)
-                         : (style ? boundColor : boundColor2));
+                    (high && bsDisplay == 2 ? bsHighColor[bsColor]
+                                            : bsLowColor[bsColor]));
       }
     }
-    if (bsPointsVisible)
+    if (bsDisplay % 2 == 1) // Points
       drawPoints (painter, bs->getAllPoints (),
-                  high ? (style ? bsHighColor : bsHighColor2)
-                       : (style ? bsColor : bsColor2));
+                  high ? bsHighColor[bsColor] : bsLowColor[bsColor]);
   }
 }
 
@@ -829,32 +768,33 @@ void BSDetectionWidget::drawBlurredSegment (QPainter &painter, bool style,
 void BSDetectionWidget::drawArlequinSegment (QPainter &painter,
                                              BlurredSegment *bs)
 {
+  bool nok = true;
+  int red, green, blue;
+  while (nok)
+  {
+    red = rand () % 256;
+    green = rand () % 256;
+    blue = rand () % 256;
+    nok = (arlequin == 1 && (red + green + blue) > 300)
+          || (arlequin == -1 && (red + green + blue) < 300);
+  }
   if (bs != NULL)
   {
-    if (bsBoundsVisible)
+    if (bsDisplay >= 2) // Bounds
     {
       vector<Pt2i> bnd;
       DigitalStraightSegment *dss = bs->getSegment ();
       if (dss != NULL)
       {
         dss->getBounds (bnd, 0, 0, width, height);
-        drawPoints (painter, bnd, boundHighColor);
+        if (bsDisplay == 3)
+          drawPoints (painter, bnd, (arlequin == 1 ? Qt::black : Qt::white));
+        else
+          drawPoints (painter, bnd, QColor (red, green, blue));
       }
     }
-    if (bsPointsVisible)
-    {     
-      bool nok = true;
-      int red, green, blue;
-      while (nok)
-      {
-        red = rand () % 256;
-        green = rand () % 256;
-        blue = rand () % 256;
-        nok = (darkHighlightOn && (red + green + blue) > 300)
-              || (! darkHighlightOn && (red + green + blue) < 300);
-      }
+    if (bsDisplay % 2 == 1) // Points
       drawPoints (painter, bs->getAllPoints (), QColor (red, green, blue));
-    }
   }
 }
 
@@ -890,16 +830,6 @@ void BSDetectionWidget::displayBackground ()
   else augmentedImage = gradImage;
   QPainter painter (&augmentedImage);
   update (QRect (QPoint (0, 0), QPoint (width, height)));
-}
-
-
-void BSDetectionWidget::writeTest ()
-{
-  ofstream outf ("test.txt", ios::out);
-  outf << p1.x() << " " << p1.y () << endl;
-  outf << p2.x() << " " << p2.y () << endl;
-  outf.close ();
-  cout << "Selection saved in test.txt" << endl;
 }
 
 
@@ -961,23 +891,20 @@ void BSDetectionWidget::displayDetectionResult ()
   vector<BlurredSegment *> bss = detector.getBlurredSegments ();
   if (! bss.empty ())
   {
-    if (bscolorset == 0 && detector.getMaxDetections () == 0)
-      srand (time (NULL));
+    if (arlequin != 0) srand (time (NULL));
     vector<BlurredSegment *>::const_iterator it = bss.begin ();
     while (it != bss.end ())
     {
-      if (bscolorset == 0 && detector.getMaxDetections () == 0)
-        drawArlequinSegment (painter, *it);
+      if (arlequin != 0) drawArlequinSegment (painter, *it);
       else
-        drawBlurredSegment (painter, bscolorset == 1, *it,
+        drawBlurredSegment (painter, *it,
                  detector.getMaxDetections () == 0 || *it == bss.back ());
       it++;
     }
   }
-  else
-    drawBlurredSegment (painter, bscolorset <= 1,
-                        detector.getBlurredSegment ());
+  else drawBlurredSegment (painter, detector.getBlurredSegment ());
   if (udef) drawSelection (painter, p1, p2);
+  arlequin = 0;
   update (QRect (QPoint (0, 0), QPoint (width, height)));
 
   // Update auxiliary view if not dragging
@@ -1002,7 +929,7 @@ void BSDetectionWidget::displaySavedSegments ()
     vector<ExtractedSegment>::iterator it = extractedSegments.begin ();
     while (it != extractedSegments.end ())
     {
-      drawBlurredSegment (painter, bscolorset <= 1, it->bs);
+      drawBlurredSegment (painter, it->bs);
       drawSelection (painter, it->p1, it->p2);
       it ++;
     }

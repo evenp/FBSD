@@ -94,6 +94,11 @@ public:
   void closeIdetAnalyzer ();
 
   /**
+   * \brief Requires the groundtruth test window closure.
+   */
+  void closeGroundtruthAnalyzer ();
+
+  /**
    * \brief Switches the pixel display window on or off.
    */
   void switchPixelAnalyzer ();
@@ -114,24 +119,26 @@ public:
   void switchIdetAnalyzer ();
 
   /**
+   * \brief Switches the groundtruth test window on or off.
+   */
+  void switchGroundtruthAnalyzer ();
+
+  /**
+   * \brief Toggles the blurred segment display style.
+   * @param back Toggles backwards if true, frontwards otherwise.
+   */
+  void toggleBlurredSegmentDisplay (bool back);
+
+  /**
    * \brief Return whether the blurred segment highlight colors are set.
    */
   inline bool isHighlightColorsOn () const { return darkHighlightOn; }
 
   /**
-   * \brief Switches the blurred segment highlight colors.
+   * \brief Toggles the blurred segment color set.
+   * @param back Toggle direction.
    */
-  void switchHighlightColors ();
-
-  /**
-   * \brief Returns the blurred segment color style for display.
-   */
-  inline int activeColorSet () const { return bscolorset; }
-
-  /**
-   * \brief Switches the random color display modality.
-   */
-  void switchArlequin ();
+  void switchColorSet (bool back);
 
   /**
    * \brief Returns whether extraction stats are displayed. */
@@ -236,32 +243,20 @@ private:
   /** Saved user definition flag. */
   bool oldudef;
 
+  /** Blurred segment display style. */
+  int bsDisplay;
+  /** Blurred segment color index. */
+  int bsColor;
+  /** Highlighted blurred segment colors. */
+  QColor bsHighColor[4];
+  /** Lowlighted blurred segment colors. */
+  QColor bsLowColor[4];
+  /** Blurred segment random color display. */
+  int arlequin;
   /** Kind of highlight colors. */
   bool darkHighlightOn;
-  /** Color style to display blurred segments. */
-  int bscolorset;
   /** Color of user selections. */
   QColor selectionColor;
-  /** Stylized color of blurred segments. */
-  QColor bsColor;
-  /** Stylized color of highlighted blurred segments. */
-  QColor bsHighColor;
-  /** Neutral color of blurred segments. */
-  QColor bsColor2;
-  /** Neutral color of highlighted blurred segments. */
-  QColor bsHighColor2;
-  /** Flag indicating whether blurred segments points are visible. */
-  bool bsPointsVisible;
-  /** Stylized color of blurred segments bounds. */
-  QColor boundColor;
-  /** Stylized color of highlighted blurred segments bounds. */
-  QColor boundHighColor;
-  /** Neutral color of blurred segments bounds. */
-  QColor boundColor2;
-  /** Neutral color of highlighted blurred segments bounds. */
-  QColor boundHighColor2;
-  /** Flag indicating whether blurred segments bounds are visible. */
-  bool bsBoundsVisible;
   /** Background type.
    * BACK_BLACK, BACK_WHITE, BACK_IMAGE, BACK_GRAD, BACK_GRADX, BACK_GRADY. */
   int background;
@@ -355,11 +350,10 @@ private:
   /**
    * \brief Draws a blurred segment.
    * @param painter Drawing device.
-   * @param style Flag indicating if specific drawing style is set.
    * @param bs Reference to the blurred segment to be drawn.
    * @param high Flag indicated whether the blurred segment is highlighted.
    */
-  void drawBlurredSegment (QPainter &painter, bool style,
+  void drawBlurredSegment (QPainter &painter,
                            BlurredSegment *bs, bool high = true);
 
   /**
@@ -395,11 +389,6 @@ private:
    * \brief Writes the stats of the last detection in a file.
    */
   void writeStats ();
-
-  /**
-   * \brief Writes the selection stroke in test.txt.
-   */
-  void writeTest ();
 
   /**
    * \brief Writes the result of the last detection in a file.
