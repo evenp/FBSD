@@ -2,7 +2,7 @@
 //#include "linespacefilter.h"
 
 
-const std::string BSDetector::VERSION = "0.2.1";
+const std::string BSDetector::VERSION = "0.2.2";
 const int BSDetector::STEP_FINAL = 0;
 const int BSDetector::STEP_INITIAL = 1;
 const int BSDetector::STEP_PRELIM = 2;
