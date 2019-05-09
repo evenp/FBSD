@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
     }
   }
 
-  if (argc < 4)
+  if (argc < 5)
   {
     usage(argv[0]);
     exit(EXIT_FAILURE);
@@ -47,9 +47,9 @@ int main (int argc, char *argv[])
   double widthBS = atof(argv[3]);
   unsigned int minSizeBS = atoi(argv[4]);
 
-  if (argc == 5)
+  if (argc == 6)
   {
-    inpoints_filename = argv[4];
+    inpoints_filename = argv[5];
     fin.open (inpoints_filename.c_str(), std::fstream::in);
     with_points = true;
   }
