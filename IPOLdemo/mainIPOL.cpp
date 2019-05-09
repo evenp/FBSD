@@ -45,6 +45,8 @@ int main (int argc, char *argv[])
   ifstream fin;  
   bool with_points = false;
   double widthBS = atof(argv[3]);
+  unsigned int minSizeBS = atoi(argv[4]);
+
   if (argc == 5)
   {
     inpoints_filename = argv[4];
@@ -114,6 +116,7 @@ int main (int argc, char *argv[])
   BSDetector detector;
   detector.setGradientMap (gMap);
   detector.setAssignedThickness (widthBS);
+  detector.setFinalSizeMinValue (minSizeBS);
 
   if (with_points)
   {
