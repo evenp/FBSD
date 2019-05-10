@@ -401,7 +401,7 @@ int BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
   //--------------
   if (finalSparsityTestOn)
   {
-    Pt2i pOrtho (pCenter.x () + bsinidir.y (), pCenter.y () - bsinidir.y ());
+    Pt2i pOrtho (pCenter.x () + bsinidir.x (), pCenter.y () - bsinidir.y ());
     DigitalStraightLine mydsl (pCenter, pOrtho, DigitalStraightLine::DSL_NAIVE);
     int mydrlf = mydsl.manhattan (bsf->getLastRight ())
                  - mydsl.manhattan (bsf->getLastLeft ());
