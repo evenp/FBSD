@@ -50,7 +50,7 @@ mean length of output line segments L/N, and mean thickness of output line
 segments W.
 
 | Measure  | T (ms) | C (\%) | N | L/N (pixels) | W (pixels) | 
-| :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
+| :---          |     :---:     |     :---:     |     :---:     |     :---:     |    :---:     | 
 | Without ADS and ATC | 75.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 16.60 | 70.2 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 10.1 | 421 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 98 | 46.22 pixels ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 8.60 | 2.20 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.16 |
 | With ADS and ATC | 66.62 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 15.47 | 67.9 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 9.6 | 478 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 111 | 41.67 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.53 | 1.89 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.13 |
 
