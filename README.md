@@ -49,6 +49,10 @@ Next tests compare both versions on real images: first the set of 102 images of 
 mean length of output line segments L/N, and mean thickness of output line
 segments W.
 
+![Figure](Images/expe0.png?raw=true)
+
+**Figure 2: Automatic detection on real images: P1020928 image from York Urban data base [1] (a), the associated groundtruth lines (d), the naive lines found without (b) and with (e) ADS and ATC concepts, the thick lines found without (c) and with (f) ADS and ATC concepts.**
+
 | Measure  | T (ms) | C (\%) | N | L/N (pixels) | W (pixels) | 
 | :---          |     :---:     |     :---:     |     :---:     |     :---:     |    :---:     | 
 | Without ADS and ATC | 75.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 16.60 | 70.2 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 10.1 | 421 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 98 | 46.22 pixels ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 8.60 | 2.20 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.16 |
@@ -58,7 +62,7 @@ segments W.
 
 ![Figure](Images/expe1.png?raw=true)
 
-**Figure 2: Automatic detection on real images: 800x533 office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
+**Figure 3: Automatic detection on real images: 800x533 office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
 
 | Measure  | T (ms) | N | L (pixels) | W (pixels) | 
 | :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
@@ -69,7 +73,7 @@ segments W.
 
 ![Figure](Images/expe2.png?raw=true)
 
-**Figure 3: Automatic detection on real images: 768x512 castle image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
+**Figure 4: Automatic detection on real images: 768x512 castle image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
 
 | Measure  | T (ms) | N | L (pixels) | W (pixels) |
 | :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
