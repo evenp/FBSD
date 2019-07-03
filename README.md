@@ -1,6 +1,7 @@
 # FBSD: Fast Blurred Segment Detector
 
 Requires at least Qt5.5
+
 Compilation by qmake and make
 
 Execution : `FBSD <imageName>`
@@ -44,14 +45,14 @@ and the found value (1.4 pixel) was taken into account in the test. Results are 
 **Table 1: Measured performance on 1000 synthesized images without and with adaptive directional scans and assigned width control.**
 
 ## 2. Experimentations on real images
-Next tests compare both versions on real images: first the set of 102 images of York Urban data base [1], then selected images for more detailed visual analysis. Reported measures are execution time T, number of output line segments N,
-mean length of output line segments L, and mean thickness of output line
+Next tests compare both versions on real images: first the set of 102 images of York Urban data base [1] augmented with manually extracted groundtruth lines, then selected images for more detailed visual analysis. Reported measures are execution time T, groundtruth covering ratio C (only for the York Urban data base), number of output line segments N,
+mean length of output line segments L/N, and mean thickness of output line
 segments W.
 
-| Measure  | T (ms) | N | L (pixels) | W (pixels) | 
+| Measure  | T (ms) | C (%) | N | L/N (pixels) | W (pixels) | 
 | :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
-| Without ADS and ATC | 75.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 16.60 | 421 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 98 | 46.22 pixels ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 8.60 | 2.20 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.16 |
-| With ADS and ATC | 66.62 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 15.47 | 478 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 111 | 41.67 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.53 | 1.89 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.13 |
+| Without ADS and ATC | 75.19 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 16.60 | 70.2 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 10.1 | 421 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 98 | 46.22 pixels ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 8.60 | 2.20 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.16 |
+| With ADS and ATC | 66.62 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 15.47 | 67.9 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 9.6 | 478 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 111 | 41.67 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.53 | 1.89 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.13 |
 
 **Table 2: Measure with and without ADS and ATC concepts on the York Urban Database [1].**
 
