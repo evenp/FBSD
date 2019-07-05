@@ -31,10 +31,9 @@ and the found value (1.4 pixel) was taken into account in the test. Results are 
 
 **Figure 1: Evaluation on synthesized images: one of the randomly generated images(left), bounding lines of output blurred segments without (middle) and with (right) ADS and ATC concepts.**
 
-| Data | Fig. 1 | Fig 1. | Whole set | Whole set |
-| :---          |     :---:     |     :---:     |     :---:     |     :---:     |
 | ADS and ATC Concepts | Without | With | Without | With |
 | :---          |     :---:     |     :---:     |     :---:     |     :---:     |
+| Data | Fig. 1 | Fig 1. | Whole set | Whole set |
 | Detected blurred segments per image  | 13 | 15 | 17.06 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.22 | 16.83 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.11  |
 | Detected long (> 40 pixels) blurred segments per image  | 12 | 11 | 11.24 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.94 | 11.36 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.97 |
 | Undetected input segments per image  | 1 | 0 | 0.152 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.43 | 0.003 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.05 |
