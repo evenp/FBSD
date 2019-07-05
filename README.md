@@ -25,24 +25,25 @@ On these groundtruth image, the numerical error on the gradient extraction biase
 This bias was first estimated using 1000 images containing only one input segment (no possible interaction)
 and the found value (1.4 pixel) was taken into account in the test. Results are given in the following table.
 
-![Figure](Images/statsExample.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-![Figure](Images/statsoldBounds.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-![Figure](Images/statsnewBounds.png?raw=true)
+![Figure](Images/randimage.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/randold.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/randnew.png?raw=true)
 
 **Figure 1: Evaluation on synthesized images: one of the randomly generated images(left), bounding lines of output blurred segments without (middle) and with (right) ADS and ATC concepts.**
 
-| ADS and ATC Concepts | Without | With |
-| :---          |     :---:     |     :---:     | 
-| Detected blurred segments per image  | 17.06 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.22 | 16.83 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.11  |
-| Detected long (> 40 pixels) blurred segments per image  | 11.24 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.94 | 11.36 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.97 |
-| Undetected input segments per image  | 0.152 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.43 | 0.003 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.05 |
-| Precision (%) : P = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#D  | 80.46 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.22 | 83.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.04 |
-| Recall (ratio of true detection) (%) : R = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#S  | 90.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.30 | 91.15 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.52 |
-| F-measure (harmonic mean) (%) : F = 2 x P x R /(P + R)  | 84.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.42 | 87.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.59 |
-| Thickness difference (in pixels) to matched input segment  | 0.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.24 | 0.59 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.19 |
-| Angle difference (in degrees) to matched input segment  | 0.61 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.66 | 0.57 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.62 |
+| Data | Fig. 1 | Fig 1. | Whole set | Whole set |
+| ADS and ATC Concepts | Without | With | Without | With |
+| :---          |     :---:     |     :---:     |     :---:     |     :---:     |
+| Detected blurred segments per image  | 13 | 15 | 17.06 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.22 | 16.83 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.11  |
+| Detected long (> 40 pixels) blurred segments per image  | 12 | 11 | 11.24 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.94 | 11.36 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.97 |
+| Undetected input segments per image  | 1 | 0 | 0.152 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.43 | 0.003 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.05 |
+| Precision (%) : P = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#D  | 76.43 | 84.21 | 80.46 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.22 | 83.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.04 |
+| Recall (ratio of true detection) (%) : R = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#S  | 84.82 | 92.76 | 90.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.30 | 91.15 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.52 |
+| F-measure (harmonic mean) (%) : F = 2 x P x R /(P + R)  | 80.41 | 88.28 | 84.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.42 | 87.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.59 |
+| Thickness difference (in pixels) to matched input segment  | 0.74 | 0.46 | 0.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.24 | 0.59 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.19 |
+| Angle difference (in degrees) to matched input segment  | 0.28 | 0.19 | 0.61 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.66 | 0.57 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.62 |
 
-**Table 1: Measured performance on 1000 synthesized images without and with adaptive directional scans and assigned width control.**
+**Table 1: Measured performance on Figure 1 image example and on a whole 1000 synthesized images set, without and with adaptive directional scans and assigned width control.**
 
 ## 2. Experimentations on real images
 Next tests compare both versions on real images: first the set of 102 images of York Urban data base [1] augmented with manually extracted groundtruth lines, then selected images for more detailed visual analysis. Reported measures are execution time T, groundtruth covering ratio C (only for the York Urban data base), number of output line segments N,
@@ -64,7 +65,7 @@ segments W.
 
 **Figure 3: Automatic detection on real images: 800x533 office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
 
-| Measure  | T (ms) | N | L (pixels) | W (pixels) | 
+| Measure  | T (ms) | N | L/N (pixels) | W (pixels) | 
 | :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
 | Without ADS and ATC | 48.16 | 254 | 53.92 | 1.99 |
 | With ADS and ATC  | 42.17 | 285 | 49.69 | 1.69 |
@@ -75,7 +76,7 @@ segments W.
 
 **Figure 4: Automatic detection on real images: 768x512 castle image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.**
 
-| Measure  | T (ms) | N | L (pixels) | W (pixels) |
+| Measure  | T (ms) | N | L/N (pixels) | W (pixels) |
 | :---          |     :---:     |     :---:     |     :---:     |    :---:     | 
 | Without ADS and ATC | 104.30 | 361 | 36.58 | 2.23 |
 | With ADS and ATC  | 94.21 | 424 | 32.18 | 1.98 |
