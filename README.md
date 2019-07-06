@@ -22,26 +22,31 @@ These tests compare both versions on a set of 1000 synthesized images containing
 10 randomly placed input segments with random width between 2 and 5 pixels.
 The absolute value of the difference of each found segment to its matched input segment is measured.
 On these groundtruth image, the numerical error on the gradient extraction biases the line width measures.
-This bias was first estimated using 1000 images containing only one input segment (no possible interaction)
-and the found value (1.4 pixel) was taken into account in the test. Results are given in the following table.
+This bias was first estimated using 1000 images containing only one input segment (no possible interaction) and the found value (1.4 pixel) was taken into account in the test.
+Results are given in the following table.
+If we call S the count of pixels of all input segments in an image, S the count of pixels of all output blurred segment, and I the count of successfully detected pixels, given measures are the count of output blurred segments, the count of output long (> 40 pixels) blurred segments, the count of undetected input segments, the precision P = I/D, the recall R = I/S, the F-measure F = 2.P.R / (P+R), the absolute value of the width difference between matched output segments with input segments, and the absolute value of the angle difference between matched output segments with input segments.
 
-![Figure](Images/randimage.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-![Figure](Images/randold.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-![Figure](Images/randnew.png?raw=true)
+![Figure](Images/randimage1.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/randold1.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/randnew1.png?raw=true)
 
-**Figure 1: Evaluation on synthesized images: one of the randomly generated images(left), bounding lines of output blurred segments without (middle) and with (right) ADS and ATC concepts.**
+![Figure](Images/randimage2.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/randold2.png?raw=true) &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+![Figure](Images/randnew2.png?raw=true)
 
-| ADS and ATC Concepts | Without | With | Without | With |
-| :---          |     :---:     |     :---:     |     :---:     |     :---:     |
-| Data | Fig. 1 | Fig 1. | Whole set | Whole set |
-| Detected blurred segments per image  | 13 | 15 | 17.06 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.22 | 16.83 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.11  |
-| Detected long (> 40 pixels) blurred segments per image  | 12 | 11 | 11.24 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.94 | 11.36 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.97 |
-| Undetected input segments per image  | 1 | 0 | 0.152 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.43 | 0.003 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.05 |
-| Precision (%) : P = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#D  | 76.43 | 84.21 | 80.46 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.22 | 83.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.04 |
-| Recall (ratio of true detection) (%) : R = #(D ![eq](https://latex.codecogs.com/gif.latex?%5Ccap) S)/#S  | 84.82 | 92.76 | 90.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.30 | 91.15 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.52 |
-| F-measure (harmonic mean) (%) : F = 2 x P x R /(P + R)  | 80.41 | 88.28 | 84.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.42 | 87.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.59 |
-| Thickness difference (in pixels) to matched input segment  | 0.74 | 0.46 | 0.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.24 | 0.59 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.19 |
-| Angle difference (in degrees) to matched input segment  | 0.28 | 0.19 | 0.61 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.66 | 0.57 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.62 |
+**Figure 1: Evaluation on synthesized images: two of the randomly generated images(left), bounding lines of output blurred segments without (middle) and with (right) ADS and ATC concepts.**
+
+| ADS and ATC Concepts | Without | With |Without | With | Without | With |
+| :---          |     :---:     |     :---:     |     :---:     |     :---:     |     :---:     |     :---:     |
+| Data | Fig.1 up | Fig.1 up | Fig.1 bottom | Fig.1 bottom | Whole set | Whole set |
+| Detected blurred segments | 16 | 17 | 14 | 18 | 17.06 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.22 | 16.83 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.11  |
+| Detected long segments | 11 | 8 | 10 | 10 | 11.24 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.94 | 11.36 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 1.97 |
+| Undetected input segments | 0 | 0 | 1 | 0 | 0.152 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.43 | 0.003 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.05 |
+| Precision (%) | 76.30 | 85.47 | 75.38 | 83.41 | 80.46 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 7.22 | 83.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 6.04 |
+| Recall (%) | 89.81 | 93.51 | 90.88 | 91.47 | 90.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.30 | 91.15 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 2.52 |
+| F-measure (%) | 82.51 | 89.31 | 82.40 | 87.26 | 84.87 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 4.42 | 87.23 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 3.59 |
+| Thickness difference (pixels) | 0.95 | 0.68 | 1.15 | 0.65 | 0.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.24 | 0.59 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.19 |
+| Angle difference (degrees) | 1.11 | 0.71 | 1.99 | 1.03 | 0.61 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.66 | 0.57 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.62 |
 
 **Table 1: Measured performance on Figure 1 image example and on a whole 1000 synthesized images set, without and with adaptive directional scans and assigned width control.**
 
