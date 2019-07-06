@@ -48,7 +48,7 @@ If we call S the count of pixels of all input segments in an image, D the count 
 | Thickness difference (pixels) | 0.95 | 0.68 | 1.15 | 0.65 | 0.70 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.24 | 0.59 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.19 |
 | Angle difference (degrees) | 1.11 | 0.71 | 1.99 | 1.03 | 0.61 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.66 | 0.57 ![eq](https://latex.codecogs.com/gif.latex?%5Cpm) 0.62 |
 
-**Table 1: Measured performance on Figure 1 image example and on a whole 1000 synthesized images set, without and with adaptive directional scans and assigned width control.**
+**Table 1: Measured performance on both Figure 1 image examples and on a whole 1000 synthesized images set, without and with adaptive directional scans and assigned width control.**
 
 ## 2. Experimentations on real images
 Next tests compare both versions on real images: first the set of 102 images of York Urban data base [1] augmented with manually extracted groundtruth lines, then selected images for more detailed visual analysis. Reported measures are execution time T, groundtruth covering ratio C (only for the York Urban data base), number of output line segments N,
