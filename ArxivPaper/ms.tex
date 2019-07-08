@@ -14,7 +14,7 @@
 \usepackage{siunitx}
 
 
-\title{Complementary Experiments of the Thick Line Segment Detection Algorithm}
+\title{Complementary Experiments of the Thick Line Segment Detection Algorithm: Evaluation of ADS and ATC Concepts}
 \date{
   $^1$ Universit\'e de Lorraine, LORIA (UMR 7503), Nancy, France \\
   \texttt{philippe.even@loria.fr},
@@ -32,23 +32,18 @@
 \abstract{This document presents complementary experiments on the
   published algorithm of Thick Line Segment Detection with Fast
   Directional Tracking. The main paper is actually published at ICIAP
-  2019 \cite{Even19}.}
-
-
-
-
-
-
-\section{Evaluation of ADS and ATC concepts}
+  2019 \cite{Even19}.
+%
 First tests compare the performance of the detector with and without
 adaptive directional scans (ADS) and assigned thickness control (ATC).
 On the detector without ADS, the fine tracking step must be performed
 twice to get less risk of growing blurred segment escape from the scan
-strip.
+strip.}
 
 
 
-\subsection{Experimentations on synthesized images}
+
+\section{Experimentations on synthesized images}
 These tests compare both versions on a set of 1000 synthesized images containing
 10 randomly placed input segments with random width between 2 and 5 pixels.
 The absolute value of the difference of each found segment to its matched input segment is measured.
@@ -123,15 +118,15 @@ Angle difference (degrees) & 1.11 & 0.71 & 1.99 & 1.03 & 0.61
 
 
 
-\subsection{Experimentations on real images}
+\section{Experimentations on real images}
 Next tests compare both versions on real images: first the set of 102
 images of York Urban data base \cite{Denis08} augmented with manually extracted
 groundtruth lines, then selected images for more detailed visual
-analysis. Reported measures are execution time T, groundtruth covering
-ratio C (only for the York Urban data base), number of output line
-segments N, mean length of output line segments L/N, and mean
-thickness of output line segments W.
-
+analysis. Reported measures are execution time $T$, groundtruth covering
+ratio $C$ (only for the York Urban data base), number of output line
+segments $N$, mean length of output line segments $L/N$, and mean
+thickness of output line segments $W$.
+\pagebreak
 \begin{figure}
   \begin{center}
   \includegraphics[width=0.95\textwidth]{Images/expe0.png}
@@ -171,8 +166,7 @@ Without ADS and ATC\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 421 \textpm 98\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
-46.22 pixels
-\textpm 8.60\strut
+46.22 \textpm 8.60\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 2.20 \textpm 0.16\strut
 \end{minipage}\tabularnewline
@@ -191,7 +185,7 @@ With ADS and ATC\strut
 \end{minipage}\tabularnewline
 \bottomrule
 \caption{Measure with and without ADS and ATC concepts on the
-York Urban Database {[}1{]}.}
+York Urban Database \cite{Denis08}.}
 \end{longtable}
 
 
