@@ -12,6 +12,9 @@
 \usepackage{multirow} 
 \usepackage{textcomp}
 \usepackage{siunitx}
+\usepackage[colorlinks=true,citecolor=blue]{hyperref}
+\usepackage[tableposition=below]{caption}
+\captionsetup[longtable]{skip=1em}
 
 
 \title{Complementary Experiments of the Thick Line Segment Detection Algorithm: Evaluation of ADS and ATC Concepts}
@@ -99,7 +102,7 @@ the given measures are:
 
 \begin{longtable}[]{@{}l||rr|rr|rr@{}}
 \toprule
-& \multicolumn{2}{c|}{On Fig. 1a} & \multicolumn{2}{c|}{On Fig. 1d}
+& \multicolumn{2}{c|}{On Fig.~1a} & \multicolumn{2}{c|}{On Fig.~1d}
 & \multicolumn{2}{c}{On whole set} \tabularnewline
 ADS \& ATC Concepts & \multicolumn{1}{c}{without} & \multicolumn{1}{c|}{with}
 & \multicolumn{1}{c}{without} & \multicolumn{1}{c|}{with}
@@ -150,12 +153,12 @@ Next tests compare both versions on real images:
 \begin{itemize}
 \item first the set of 102 images of York Urban data base \cite{Denis08}
 augmented with manually extracted groundtruth lines (an example in
-Fig. \ref{fig:synth}),
+Fig.~\ref{fig:synth}),
 \item then selected images for more detailed visual analysis
-(Fig. \ref{fig:office} and Fig. \ref{fig:castle}).
+(Fig.~\ref{fig:office} and Fig.~\ref{fig:castle}).
 \end{itemize}
-Reported measures in Tab. \ref{tab:york}, Tab. \ref{tab:office} and
-Tab. \ref{tab:castle}
+Reported measures in Tab.~\ref{tab:york}, Tab.~\ref{tab:office} and
+Tab.~\ref{tab:castle}
 are execution time $T$, groundtruth covering
 ratio $C$ (only for the York Urban data base), number of output line
 segments $N$, mean length of output line segments $L/N$, and mean
@@ -165,7 +168,7 @@ Shorter execution time is achieved with the new concepts.
 Detected blurred segments are shorter but thinner.
 Obviously the constant assigned thickness augments the probability to extend
 the segments with outlier edge points as can be noticed in the detail of
-office (Fig. \ref{fig:office}) and castle images (Fig. \ref{fig:castle}).
+office (Fig.~\ref{fig:office}) and castle images (Fig.~\ref{fig:castle}).
 Moreover, brick joints are better detected in castle image.
 
 \begin{figure}[h]
@@ -225,7 +228,7 @@ With ADS \& ATC\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 1.89 \textpm 0.13\strut
 \end{minipage}\tabularnewline
-\bottomrule
+\bottomrule  
 \caption{Measure with and without ADS and ATC concepts on the
 York Urban Database \cite{Denis08}.}
 \label{tab:york}
