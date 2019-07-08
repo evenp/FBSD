@@ -54,9 +54,9 @@ On these groundtruth image, the numerical error on the gradient extraction biase
 This bias was first estimated using 1000 images containing only one input segment (no possible interaction) and the found value (1.4 pixel) was taken into account in the test.
 Results are given in the following table. \\
 
-If we call S the count of pixels of all input segments in an image,
-D the count of pixels of all output blurred segments,
-and I the count of successfully detected pixels (intersection of D ans S),
+If we call $S$ the count of pixels of all input segments in an image,
+$D$ the count of pixels of all output blurred segments,
+and $I$ the count of successfully detected pixels ($D \cap S$),
 the given measures are:
 \begin{enumerate}
 \item the count of output blurred segments,
@@ -141,7 +141,9 @@ Angle difference (degrees) & 1.11 & 0.71 & 1.99 & 1.03 & 0.61
 0.57 \textpm
 0.62\tabularnewline
 \bottomrule
-\caption{Measured performance on both Figure 1 image examples and on a whole 1000 synthesized images set, without and with adaptive directional scans and assigned width control}
+\caption{Measured performance on both Figure 1 image examples and on
+a whole 1000 synthesized images set, without and with adaptive directional
+scans and assigned width control.}
 \label{tab:synth}
 \end{longtable}
 
@@ -185,10 +187,10 @@ Moreover, brick joints are better detected in castle image.
 
 
 
-\begin{longtable}[]{@{}l@{}|@{}c@{}c@{}c@{}c@{}c@{}}
+\begin{longtable}[]{l@{}|@{}c@{}c@{}c@{}c@{}c@{}}
 \toprule
-\begin{minipage}[b]{0.24\columnwidth}\raggedright
-Measure\strut
+\begin{minipage}[b]{0.18\columnwidth}\raggedright
+ADS \& ATC\strut
 \end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
 T (ms)\strut
 \end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
@@ -202,8 +204,8 @@ W (pixels)\strut
 \end{minipage}\tabularnewline
 \midrule
 \endhead
-\begin{minipage}[t]{0.24\columnwidth}\raggedright
-Without ADS \& ATC\strut
+\begin{minipage}[t]{0.18\columnwidth}\raggedright
+Without\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 75.19 \textpm 16.60\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
@@ -215,8 +217,8 @@ Without ADS \& ATC\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 2.20 \textpm 0.16\strut
 \end{minipage}\tabularnewline
-\begin{minipage}[t]{0.24\columnwidth}\raggedright
-With ADS \& ATC\strut
+\begin{minipage}[t]{0.18\columnwidth}\raggedright
+With\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 66.62 \textpm 15.47\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
@@ -241,28 +243,39 @@ York Urban Database \cite{Denis08}.}
   \begin{center}
   \includegraphics[width=0.95\textwidth]{Images/expe1.png}
   \end{center}
-  \caption{Automatic detection on real images: 800x533 office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.}
+  \caption{Automatic detection on real images: 800x533 office image (a),
+    the segments found without (b) and with (c) ADS and ATC concepts,
+    a detail of the image (d,g),
+    the points of detected blurred segments without (e) and with (f) ADS
+    and ATC concepts and the bounding lines of detected blurred segments
+    without (h) and with (i) ADS and ATC concepts.}
   \label{fig:office}
 \end{figure}
 
 
 
-\begin{longtable}[]{@{}l|cccc@{}}
+\begin{longtable}[]{l|cccc}
 \toprule
-Measure & T (ms) & N & L/N (pixels) & W (pixels)\tabularnewline
+\begin{minipage}[b]{0.18\columnwidth}\raggedright
+ADS \& ATC \strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
+T (ms) \strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
+N \strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
+L/N (pixels) \strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
+W (pixels) \strut
+\end{minipage} \tabularnewline
 \midrule 
-Without ADS \& ATC & 48.16 & 254 & 53.92 & 1.99\tabularnewline
-With ADS \& ATC & 42.17 & 285 & 49.69 & 1.69\tabularnewline
+Without & 48.16 & 254 & 53.92 & 1.99 \tabularnewline
+With & 42.17 & 285 & 49.69 & 1.69 \tabularnewline
 \bottomrule
-\caption{Measure with and without ADS and ATC concepts on office
-image.}
+\caption{Measure with and without ADS and ATC concepts on office image.}
 \label{tab:office}
 \end{longtable}
 
-
-
 \pagebreak
-
 
 \begin{figure}
   \begin{center}
@@ -273,17 +286,25 @@ image.}
 \end{figure}
 
 
-
-\begin{longtable}[]{@{}l|cccc@{}}
+\begin{longtable}[]{l|cccc}
 \toprule
-Measure & T (ms) & N & L/N (pixels) & W (pixels)\tabularnewline
+\begin{minipage}[b]{0.18\columnwidth}\raggedright
+ADS \& ATC \strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
+T (ms) \strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
+N \strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
+L/N (pixels) \strut
+\end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
+W (pixels) \strut
+\end{minipage} \tabularnewline
 \midrule
-Without ADS \& ATC & 104.30 & 361 & 36.58 & 2.23\tabularnewline
-With ADS \& ATC & 94.21 & 424 & 32.18 & 1.98\tabularnewline
+Without & 104.30 & 361 & 36.58 & 2.23 \tabularnewline
+With & 94.21 & 424 & 32.18 & 1.98 \tabularnewline
 \bottomrule
 
-\caption{Measure with and without ADS and ATC concepts on castle
-image.}
+\caption{Measure with and without ADS and ATC concepts on castle image.}
 \label{tab:castle}
 \end{longtable}
 
