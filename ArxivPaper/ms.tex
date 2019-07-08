@@ -49,8 +49,22 @@ These tests compare both versions on a set of 1000 synthesized images containing
 The absolute value of the difference of each found segment to its matched input segment is measured.
 On these groundtruth image, the numerical error on the gradient extraction biases the line width measures.
 This bias was first estimated using 1000 images containing only one input segment (no possible interaction) and the found value (1.4 pixel) was taken into account in the test.
-Results are given in the following table.
-If we call S the count of pixels of all input segments in an image, D the count of pixels of all output blurred segments, and I the count of successfully detected pixels (intersection of D ans S), the given measures are 1) the count of output blurred segments, 2) the count of output long ($>$ 40 pixels) blurred segments, 3) the count of undetected input segments, 4) the precision $P = I/D$, 5) the recall $R = I/S$, 6) the F-measure $F = 2.P.R / (P+R), 7$) the absolute value of the width difference between matched output segments with input segments, and 8) the absolute value of the angle difference between matched output segments with input segments.
+Results are given in the following table. \\
+
+If we call S the count of pixels of all input segments in an image,
+D the count of pixels of all output blurred segments,
+and I the count of successfully detected pixels (intersection of D ans S),
+the given measures are:
+\begin{enumerate}
+\item the count of output blurred segments,
+\item the count of output long ($>$ 40 pixels) blurred segments,
+\item the count of undetected input segments,
+\item the precision $P = I/D$,
+\item the recall $R = I/S$,
+\item the F-measure $F = 2.P.R / (P+R)$,
+\item the absolute value of the width difference between matched output segments with input segments,
+\item the absolute value of the angle difference between matched output segments with input segments.
+\end{enumerate}
 
 \pagebreak
 
@@ -61,25 +75,36 @@ If we call S the count of pixels of all input segments in an image, D the count 
     \includegraphics[width=0.3\textwidth]{Images/randnew1.png} \\
     \includegraphics[width=0.3\textwidth]{Images/randimage2.png}&
     \includegraphics[width=0.3\textwidth]{Images/randold2.png}&
-    \includegraphics[width=0.3\textwidth]{Images/randnew2.png}\\
-
-
-
+    \includegraphics[width=0.3\textwidth]{Images/randnew2.png}
+    \begin{picture}(1,1)(0,0)
+      \put(-320,141.5){\circle{10}}
+      \put(-322.5,139){a}
+      \put(-175,141.5){\circle{10}}
+      \put(-177.5,139){b}
+      \put(-30,141.5){\circle{10}}
+      \put(-32.5,139){c}
+      \put(-320,5.5){\circle{10}}
+      \put(-322.5,3){d}
+      \put(-175,5.5){\circle{10}}
+      \put(-177.5,3){e}
+      \put(-30,5.5){\circle{10}}
+      \put(-32.5,3){f}
+    \end{picture} \\
   \end{tabular}
   \caption{Evaluation on synthesized images: two of the
-  randomly generated images(left), bounding lines of output blurred
-  segments without (middle) and with (right) ADS and ATC concepts.}
+  randomly generated images (a,d), bounding lines of output blurred
+  segments without (b,e) and with (c,f) ADS and ATC concepts.}
+  \label{fig:synth}
 \end{figure}
 
-
-
-\begin{longtable}[]{@{}l|cccccc@{}}
+\begin{longtable}[]{@{}l||rr|rr|rr@{}}
 \toprule
-ADS and ATC Concepts & Without & With & Without & With & Without &
-With\tabularnewline
+& \multicolumn{2}{c|}{On Fig. 1a} & \multicolumn{2}{c|}{On Fig. 1d}
+& \multicolumn{2}{c}{On whole set} \tabularnewline
+ADS \& ATC Concepts & \multicolumn{1}{c}{without} & \multicolumn{1}{c|}{with}
+& \multicolumn{1}{c}{without} & \multicolumn{1}{c|}{with}
+& \multicolumn{1}{c}{without} & \multicolumn{1}{c}{with} \tabularnewline
 \midrule
-Data & \parbox{0.01\textwidth}{Fig.1 \\ up} & \parbox{0.01\textwidth}{Fig.1\\ up} & \parbox{0.01\textwidth}{Fig.1\\ bot.} & \parbox{0.01\textwidth}{Fig.1\\bot.} & Whole set &
-Whole set\tabularnewline \hline
 Detected blurred segments & 16 & 17 & 14 & 18 & 17.06
 \textpm 3.22 &
 16.83 \textpm
@@ -114,35 +139,52 @@ Angle difference (degrees) & 1.11 & 0.71 & 1.99 & 1.03 & 0.61
 0.62\tabularnewline
 \bottomrule
 \caption{Measured performance on both Figure 1 image examples and on a whole 1000 synthesized images set, without and with adaptive directional scans and assigned width control}
+\label{tab:synth}
 \end{longtable}
 
-
+\pagebreak
 
 \section{Experimentations on real images}
-Next tests compare both versions on real images: first the set of 102
-images of York Urban data base \cite{Denis08} augmented with manually extracted
-groundtruth lines, then selected images for more detailed visual
-analysis. Reported measures are execution time $T$, groundtruth covering
+
+Next tests compare both versions on real images:
+\begin{itemize}
+\item first the set of 102 images of York Urban data base \cite{Denis08}
+augmented with manually extracted groundtruth lines (an example in
+Fig. \ref{fig:synth}),
+\item then selected images for more detailed visual analysis
+(Fig. \ref{fig:office} and Fig. \ref{fig:castle}).
+\end{itemize}
+Reported measures in Tab. \ref{tab:york}, Tab. \ref{tab:office} and
+Tab. \ref{tab:castle}
+are execution time $T$, groundtruth covering
 ratio $C$ (only for the York Urban data base), number of output line
 segments $N$, mean length of output line segments $L/N$, and mean
-thickness of output line segments $W$.
-\pagebreak
-\begin{figure}
+thickness of output line segments $W$. \\
+
+Shorter execution time is achieved with the new concepts.
+Detected blurred segments are shorter but thinner.
+Obviously the constant assigned thickness augments the probability to extend
+the segments with outlier edge points as can be noticed in the detail of
+office (Fig. \ref{fig:office}) and castle images (Fig. \ref{fig:castle}).
+Moreover, brick joints are better detected in castle image.
+
+\begin{figure}[h]
   \begin{center}
   \includegraphics[width=0.95\textwidth]{Images/expe0.png}
   \end{center}
-  \caption{Automatic detection on real images: P1020928 image from
-    York Urban data base \cite{Denis08} (a), the associated groundtruth lines
-    (d), the naive lines found without (b) and with (e) ADS and ATC
-    concepts, the thick lines found without (c) and with (f) ADS and
-    ATC concepts.}
+  \caption{Automatic detection on real images:
+    P1020928 image from York Urban data base \cite{Denis08} (a),
+    the associated groundtruth lines (d),
+    the naive lines found without (b) and with (e) ADS and ATC concepts,
+    the thick lines found without (c) and with (f) ADS and ATC concepts.}
+  \label{fig:york}
 \end{figure}
 
 
 
-\begin{longtable}[]{@{}l@{}c@{}c@{}c@{}c@{}c@{}}
+\begin{longtable}[]{@{}l@{}|@{}c@{}c@{}c@{}c@{}c@{}}
 \toprule
-\begin{minipage}[b]{0.14\columnwidth}\raggedright
+\begin{minipage}[b]{0.24\columnwidth}\raggedright
 Measure\strut
 \end{minipage} & \begin{minipage}[b]{0.14\columnwidth}\centering
 T (ms)\strut
@@ -157,8 +199,8 @@ W (pixels)\strut
 \end{minipage}\tabularnewline
 \midrule
 \endhead
-\begin{minipage}[t]{0.14\columnwidth}\raggedright
-Without ADS and ATC\strut
+\begin{minipage}[t]{0.24\columnwidth}\raggedright
+Without ADS \& ATC\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 75.19 \textpm 16.60\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
@@ -170,8 +212,8 @@ Without ADS and ATC\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 2.20 \textpm 0.16\strut
 \end{minipage}\tabularnewline
-\begin{minipage}[t]{0.14\columnwidth}\raggedright
-With ADS and ATC\strut
+\begin{minipage}[t]{0.24\columnwidth}\raggedright
+With ADS \& ATC\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
 66.62 \textpm 15.47\strut
 \end{minipage} & \begin{minipage}[t]{0.14\columnwidth}\centering
@@ -186,8 +228,10 @@ With ADS and ATC\strut
 \bottomrule
 \caption{Measure with and without ADS and ATC concepts on the
 York Urban Database \cite{Denis08}.}
+\label{tab:york}
 \end{longtable}
 
+\pagebreak
 
 
 \begin{figure}
@@ -195,23 +239,26 @@ York Urban Database \cite{Denis08}.}
   \includegraphics[width=0.95\textwidth]{Images/expe1.png}
   \end{center}
   \caption{Automatic detection on real images: 800x533 office image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.}
+  \label{fig:office}
 \end{figure}
 
 
 
-\begin{longtable}[]{@{}lcccc@{}}
+\begin{longtable}[]{@{}l|cccc@{}}
 \toprule
 Measure & T (ms) & N & L/N (pixels) & W (pixels)\tabularnewline
 \midrule 
-Without ADS and ATC & 48.16 & 254 & 53.92 & 1.99\tabularnewline
-With ADS and ATC & 42.17 & 285 & 49.69 & 1.69\tabularnewline
+Without ADS \& ATC & 48.16 & 254 & 53.92 & 1.99\tabularnewline
+With ADS \& ATC & 42.17 & 285 & 49.69 & 1.69\tabularnewline
 \bottomrule
 \caption{Measure with and without ADS and ATC concepts on office
 image.}
+\label{tab:office}
 \end{longtable}
 
 
 
+\pagebreak
 
 
 \begin{figure}
@@ -219,24 +266,24 @@ image.}
   \includegraphics[width=0.95\textwidth]{Images/expe2.png}
   \end{center}
   \caption{Automatic detection on real images: 768x512 castle image (a), the segments found without (b) and with (c) ADS and ATC concepts, a detail of the image (d,g), the points of detected blurred segments without (e) and with (f) ADS and ATC concepts and the bounding lines of detected blurred segments without (h) and with (i) ADS and ATC concepts.}
+\label{fig:castle}
 \end{figure}
 
 
 
-\begin{longtable}[]{@{}lcccc@{}}
+\begin{longtable}[]{@{}l|cccc@{}}
 \toprule
 Measure & T (ms) & N & L/N (pixels) & W (pixels)\tabularnewline
 \midrule
-Without ADS and ATC & 104.30 & 361 & 36.58 & 2.23\tabularnewline
-With ADS and ATC & 94.21 & 424 & 32.18 & 1.98\tabularnewline
+Without ADS \& ATC & 104.30 & 361 & 36.58 & 2.23\tabularnewline
+With ADS \& ATC & 94.21 & 424 & 32.18 & 1.98\tabularnewline
 \bottomrule
 
 \caption{Measure with and without ADS and ATC concepts on castle
 image.}
-
+\label{tab:castle}
 \end{longtable}
 
-Shorter execution time is achieved with the new concepts. Detected blurred segments are shorter but thinner. Obviously the constant assigned thickness augments the probability to extend the segments with outlier edge points as can be noticed in the detail of office and castle images. Moreover, brick joints are better detected in castle image.
 
 \bibliographystyle{plain}
 \bibliography{ms}
