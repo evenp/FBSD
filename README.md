@@ -2,13 +2,13 @@
 
 Requires at least Qt5.5
 
-Compilation by qmake and make
+Compilation by `qmake` and `make`
 
 Execution : `FBSD <imageName>`
 
-Detects ans edits segments in naivelines.txt : `FBSD -out <imageName>`
+Detects and edits segments in naivelines.txt : `FBSD -out <imageName>`
 
-Test on synthetized images : `FBSD -random` (requires some patience)
+Test on synthetized images : `FBSD -random`
 
 <a href="http://ipol-geometry.loria.fr/~kerautre/ipol_demo/FBSD_IPOLDemo">Online demo</a> also available.
 
