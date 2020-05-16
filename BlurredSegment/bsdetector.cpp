@@ -230,7 +230,7 @@ bool BSDetector::runMultiDetection (const Pt2i &p1, const Pt2i &p2)
 {
   vector<Pt2i> pts;
   p1.draw (pts, p2);
-  int locmax[pts.size ()];
+  int *locmax = new int[pts.size ()];
   int nlm = gMap->localMax (locmax, pts);
   bool isnext = true;
   for (int i = 0; isnext && i < nlm; i++)
@@ -407,7 +407,7 @@ int BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
                  - mydsl.manhattan (bsf->getLastLeft ());
     if (mydrlf < 0) mydrlf = -mydrlf; // Case of horizontal P1P2
     int expansion = 1 + mydrlf;
-    if (expansion < 20 && bsf->size () < (expansion * 4) / 5)
+    if (expansion < 20 && (int) (bsf->size ()) < (expansion * 4) / 5)
       return RESULT_FINAL_TOO_SPARSE;
   }
 
@@ -416,7 +416,7 @@ int BSDetector::detect (const Pt2i &p1, const Pt2i &p2,
   if (finalFragmentationTestOn)
   {
     int bsccp = bsf->countOfConnectedPoints (fragmentMinSize);
-    int bssize = bsf->getAllPoints().size ();
+    int bssize = (int) (bsf->getAllPoints().size ());
     if (bsccp < bssize / 2) return RESULT_FINAL_TOO_FRAGMENTED;
   }
 
@@ -557,7 +557,7 @@ int BSDetector::staticDetect (const Pt2i &p1, const Pt2i &p2,
                  - mydsl.manhattan (bsf->getLastLeft ());
     if (mydrlf < 0) mydrlf = -mydrlf; // Case of horizontal P1P2
     int expansion = 1 + mydrlf;
-    if (bsf->size () < expansion / 2)
+    if ((int) (bsf->size ()) < expansion / 2)
       return RESULT_FINAL_TOO_SPARSE;
   }
 
@@ -566,7 +566,7 @@ int BSDetector::staticDetect (const Pt2i &p1, const Pt2i &p2,
   if (finalFragmentationTestOn)
   {
     int bsccp = bsf->countOfConnectedPoints (fragmentMinSize);
-    int bssize = bsf->getAllPoints().size ();
+    int bssize = (int) (bsf->getAllPoints().size ());
     if (bsccp < bssize / 2) return RESULT_FINAL_TOO_FRAGMENTED;
   }
 

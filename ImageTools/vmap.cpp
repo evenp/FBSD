@@ -514,8 +514,9 @@ int VMap::keepFreeElementsIn (const vector<Pt2i> &pix, int n, int *ind) const
 
 int VMap::keepContrastedMax (int *lmax, int n, int *in) const
 {
-  int min[n-1];
-  bool fired[n];
+  if (n == 0) return 0;
+  int *min = new int[n-1];
+  bool *fired = new bool[n];
   int nbfired = 0;
   int sleft = 0;
 
