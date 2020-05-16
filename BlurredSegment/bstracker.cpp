@@ -118,8 +118,6 @@ BlurredSegment *BSTracker::fastTrack (int bsMaxWidth,
   // Extends the segment
   int lstop = 0;
   int rstop = 0;
-  int lstart = 0;
-  int rstart = 0;
   bool added = false;
   bool scanningRight = true;
   bool scanningLeft = true;
@@ -186,8 +184,6 @@ BlurredSegment *BSTracker::fastTrack (int bsMaxWidth,
       }
     }
   }
-  if (rstart) bs.removeRight (rstart);
-  if (lstart) bs.removeLeft (lstart);
   delete ds;
   return (bs.endOfBirth ());
 }
